@@ -23,28 +23,24 @@ namespace WraithLite.Services
             await writer.WriteAsync(loginString);
 
             var result = await reader.ReadLineAsync();
-            if (!string.IsNullOrEmpty(result))
+
+            Console.WriteLine($"SGE Response: {result}");
+
+            if (result?.StartsWith("A\t") == true)
             {
-                Console.WriteLine($"[SGE Response] {result}");
-                if (result.StartsWith("A\t"))
+                var parts = result.Split('\t');
+                if (parts.Length >= 7)
                 {
-                    var parts = result.Split('\t');
-                    if (parts.Length >= 7)
-                    {
-                        string gameHost = parts[4];
-                        int gamePort = int.Parse(parts[5]);
-                        string gameKey = parts[6];
-                        return $"{gameHost}:{gamePort}:{gameKey}";
-                    }
-                    else
-                    {
-                        throw new Exception("Incomplete login response.");
-                    }
+                    return $"{parts[4]}:{parts[5]}:{parts[6]}";
                 }
-                else if (result.StartsWith("E\t"))
+                else
                 {
-                    throw new Exception($"Login failed: {result}");
+                    throw new Exception("Login succeeded but response format was invalid.");
                 }
+            }
+            else if (result?.StartsWith("E\t") == true)
+            {
+                throw new Exception($"Login error from server: {result}");
             }
 
             throw new Exception("No valid response from SGE.");
