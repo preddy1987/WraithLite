@@ -1,0 +1,54 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35707.178 d17.12
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WraithLite", "WraithLite\WraithLite\WraithLite.csproj", "{EACBE7FF-DCB0-4F1B-A20D-45579B1C13D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WraithLite.Droid", "WraithLite\WraithLite.Droid\WraithLite.Droid.csproj", "{71FA8F32-411A-48C9-B20C-2A77741DB686}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WraithLite.iOS", "WraithLite\WraithLite.iOS\WraithLite.iOS.csproj", "{F338E06E-B524-403E-837F-15820CC70EA3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WraithLite.Mac", "WraithLite\WraithLite.Mac\WraithLite.Mac.csproj", "{A6724CC8-41F1-4295-8543-77B8E2E4E76E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WraithLite.WinUI", "WraithLite\WraithLite.WinUI\WraithLite.WinUI.csproj", "{B72330F1-A5D1-4A23-B6EC-A9CA18A4E1F6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EACBE7FF-DCB0-4F1B-A20D-45579B1C13D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EACBE7FF-DCB0-4F1B-A20D-45579B1C13D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EACBE7FF-DCB0-4F1B-A20D-45579B1C13D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EACBE7FF-DCB0-4F1B-A20D-45579B1C13D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71FA8F32-411A-48C9-B20C-2A77741DB686}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71FA8F32-411A-48C9-B20C-2A77741DB686}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71FA8F32-411A-48C9-B20C-2A77741DB686}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{71FA8F32-411A-48C9-B20C-2A77741DB686}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71FA8F32-411A-48C9-B20C-2A77741DB686}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71FA8F32-411A-48C9-B20C-2A77741DB686}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{F338E06E-B524-403E-837F-15820CC70EA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F338E06E-B524-403E-837F-15820CC70EA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F338E06E-B524-403E-837F-15820CC70EA3}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{F338E06E-B524-403E-837F-15820CC70EA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F338E06E-B524-403E-837F-15820CC70EA3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F338E06E-B524-403E-837F-15820CC70EA3}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{A6724CC8-41F1-4295-8543-77B8E2E4E76E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6724CC8-41F1-4295-8543-77B8E2E4E76E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6724CC8-41F1-4295-8543-77B8E2E4E76E}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{A6724CC8-41F1-4295-8543-77B8E2E4E76E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6724CC8-41F1-4295-8543-77B8E2E4E76E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6724CC8-41F1-4295-8543-77B8E2E4E76E}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{B72330F1-A5D1-4A23-B6EC-A9CA18A4E1F6}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{B72330F1-A5D1-4A23-B6EC-A9CA18A4E1F6}.Debug|Any CPU.Build.0 = Debug|x64
+		{B72330F1-A5D1-4A23-B6EC-A9CA18A4E1F6}.Debug|Any CPU.Deploy.0 = Debug|x64
+		{B72330F1-A5D1-4A23-B6EC-A9CA18A4E1F6}.Release|Any CPU.ActiveCfg = Release|x64
+		{B72330F1-A5D1-4A23-B6EC-A9CA18A4E1F6}.Release|Any CPU.Build.0 = Release|x64
+		{B72330F1-A5D1-4A23-B6EC-A9CA18A4E1F6}.Release|Any CPU.Deploy.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
