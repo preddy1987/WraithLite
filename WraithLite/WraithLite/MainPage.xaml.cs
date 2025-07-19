@@ -1,9 +1,40 @@
-﻿using WraithLite.ViewModels;
+﻿using WraithLite.Services;
+using WraithLite.ViewModels;
 
 namespace WraithLite
 {
     public partial class MainPage : ContentPage
     {
+        private readonly GameClient _client = new();
+
+        private async void OnConnectClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                var token = await _client.GetGameTokenAsync("preddy777", "avamae1212");
+                var parts = token.Split(':');
+                await _client.ConnectToGameAsync(parts[0], int.Parse(parts[1]), parts[2], OnGameOutput);
+            }
+            catch (Exception ex)
+            {
+                GameOutput.Text += $"ERROR: {ex.Message}\n";
+            }
+        }
+
+        private void OnGameOutput(string line)
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                GameOutput.Text += line + "\n";
+            });
+        }
+        private async void OnCommandEntered(object sender, EventArgs e)
+        {
+            var cmd = CommandEntry.Text;
+            CommandEntry.Text = "";
+            await _client.SendCommandAsync(cmd);
+        }
+
         public MainPage()
         {
             InitializeComponent();

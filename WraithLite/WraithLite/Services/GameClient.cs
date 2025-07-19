@@ -23,16 +23,31 @@ namespace WraithLite.Services
             await writer.WriteAsync(loginString);
 
             var result = await reader.ReadLineAsync();
-            if (result?.StartsWith("A\t") == true)
+            if (!string.IsNullOrEmpty(result))
             {
-                var parts = result.Split('\t');
-                string gameHost = parts[4];
-                int gamePort = int.Parse(parts[5]);
-                string gameKey = parts[6];
-                return $"{gameHost}:{gamePort}:{gameKey}";
+                Console.WriteLine($"[SGE Response] {result}");
+                if (result.StartsWith("A\t"))
+                {
+                    var parts = result.Split('\t');
+                    if (parts.Length >= 7)
+                    {
+                        string gameHost = parts[4];
+                        int gamePort = int.Parse(parts[5]);
+                        string gameKey = parts[6];
+                        return $"{gameHost}:{gamePort}:{gameKey}";
+                    }
+                    else
+                    {
+                        throw new Exception("Incomplete login response.");
+                    }
+                }
+                else if (result.StartsWith("E\t"))
+                {
+                    throw new Exception($"Login failed: {result}");
+                }
             }
 
-            throw new Exception("Failed to authenticate or retrieve game token.");
+            throw new Exception("No valid response from SGE.");
         }
 
         public async Task ConnectToGameAsync(string host, int port, string key, Action<string> onGameOutput)

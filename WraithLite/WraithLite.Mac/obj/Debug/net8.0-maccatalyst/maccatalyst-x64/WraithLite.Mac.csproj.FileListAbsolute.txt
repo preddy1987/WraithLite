@@ -290,3 +290,4 @@ C:\workspace\WraithLite\WraithLite\WraithLite.Mac\obj\Debug\net8.0-maccatalyst\m
 C:\workspace\WraithLite\WraithLite\WraithLite.Mac\obj\Debug\net8.0-maccatalyst\maccatalyst-x64\WraithLite.Mac.pdb
 C:\workspace\WraithLite\WraithLite\WraithLite.Mac\obj\Debug\net8.0-maccatalyst\maccatalyst-x64\WraithLite.Mac.genruntimeconfig.cache
 C:\workspace\WraithLite\WraithLite\WraithLite.Mac\obj\Debug\net8.0-maccatalyst\maccatalyst-x64\ref\WraithLite.Mac.dll
+C:\workspace\WraithLite\WraithLite\WraithLite.Mac\obj\Debug\net8.0-maccatalyst\maccatalyst-x64\WraithLite.Mac.sourcelink.json
