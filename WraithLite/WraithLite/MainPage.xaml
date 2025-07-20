@@ -6,7 +6,7 @@
              x:DataType="vm:MainViewModel">
 
     <VerticalStackLayout Padding="10" Spacing="10">
-        <!-- Your existing Connect button -->
+        <!-- Existing Connect button -->
         <Button x:Name="ConnectButton"
           Text="Connect"
           Clicked="OnConnectClicked" />
@@ -15,6 +15,13 @@
         <Button x:Name="LichButton"
           Text="Lich"
           Clicked="OnLichClicked" />
+
+        <!-- Credentials entries (if not already present) -->
+        <Entry x:Name="UsernameEntry"
+         Placeholder="Username" />
+        <Entry x:Name="PasswordEntry"
+         Placeholder="Password"
+         IsPassword="True" />
 
         <!-- Game UI -->
         <Editor x:Name="GameOutput"

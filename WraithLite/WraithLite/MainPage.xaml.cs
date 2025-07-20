@@ -39,7 +39,7 @@ namespace WraithLite
             {
                 // 1) Challenge & hash
                 GameOutput.Text += "Requesting challenge key…\n";
-                var (host, port, key) = await _client.FullSgeLoginAsync("preddy777", "avamae1212");
+                var (host, port, key) = await _client.FullSgeLoginAsync(UsernameEntry.Text, PasswordEntry.Text);
 
                 // 2) Got back host/port/key
                 GameOutput.Text += $"Received SGE host={host}, port={port}, key={key}\n";
@@ -59,11 +59,12 @@ namespace WraithLite
         {
             if (!_lichRunning)
             {
-                // Start headless Lich5
+                // 1) Build the ruby + lich command
+                //    Adjust "ruby" to the full Ruby path if needed.
                 var psi = new ProcessStartInfo
                 {
-                    FileName = @"C:\Users\pREDDY\Desktop\Lich5\headless.bat",
-                    Arguments = $"--login={UsernameEntry.Text} --password={PasswordEntry.Text}",
+                    FileName = "ruby",
+                    Arguments = $"lich.rbw --client-mode --frontend=dumb --login={UsernameEntry.Text} --password={PasswordEntry.Text}",
                     WorkingDirectory = @"C:\Users\pREDDY\Desktop\Lich5",
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
@@ -72,16 +73,18 @@ namespace WraithLite
                     CreateNoWindow = true
                 };
 
+                // 2) Start Lich5 headlessly
                 _lichProcess = Process.Start(psi);
                 _lichProcess.OutputDataReceived += (s, ev) => {
-                    if (ev.Data != null)
-                        MainThread.BeginInvokeOnMainThread(() => GameOutput.Text += ev.Data + "\n");
+                    if (!string.IsNullOrEmpty(ev.Data))
+                        MainThread.BeginInvokeOnMainThread(() =>
+                            GameOutput.Text += ev.Data + "\n");
                 };
                 _lichProcess.ErrorDataReceived += (s, ev) => {
-                    if (ev.Data != null)
-                        MainThread.BeginInvokeOnMainThread(() => GameOutput.Text += "[ERR] " + ev.Data + "\n");
+                    if (!string.IsNullOrEmpty(ev.Data))
+                        MainThread.BeginInvokeOnMainThread(() =>
+                            GameOutput.Text += "[Lich ERR] " + ev.Data + "\n");
                 };
-
                 _lichProcess.BeginOutputReadLine();
                 _lichProcess.BeginErrorReadLine();
 
@@ -90,13 +93,9 @@ namespace WraithLite
             }
             else
             {
-                // Stop Lich5
-                try
-                {
-                    _lichProcess.Kill();
-                }
-                catch { /* ignore */ }
-
+                // 3) Tear it down
+                try { _lichProcess.Kill(); }
+                catch { /* ignore if already exited */ }
                 _lichProcess.Dispose();
                 _lichProcess = null;
                 _lichRunning = false;
@@ -111,11 +110,20 @@ namespace WraithLite
                 GameOutput.Text += line + "\n";
             });
         }
-        private async void OnCommandEntered(object sender, EventArgs e)
+        async void OnCommandEntered(object sender, EventArgs e)
         {
             var cmd = CommandEntry.Text;
             CommandEntry.Text = "";
-            await _client.SendCommandAsync(cmd);
+
+            if (_lichRunning && _lichProcess != null)
+            {
+                await _lichProcess.StandardInput.WriteLineAsync(cmd);
+            }
+            else
+            {
+                // fallback to your existing Direct SGE path
+                await _client.SendCommandAsync(cmd);
+            }
         }
 
         public MainPage()
@@ -131,6 +139,7 @@ namespace WraithLite
                 vm.SendCommand();
             }
         }
+
     }
 
 }
