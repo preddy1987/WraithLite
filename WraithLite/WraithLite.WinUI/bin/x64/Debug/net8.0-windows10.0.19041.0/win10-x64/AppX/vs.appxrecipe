@@ -29,7 +29,7 @@
     <AppXManifest Include="C:\workspace\WraithLite\WraithLite\WraithLite.WinUI\bin\x64\Debug\net8.0-windows10.0.19041.0\win10-x64\AppxManifest.xml">
       <PackagePath>AppxManifest.xml</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2025-07-20T03:08:42.484</Modified>
+      <Modified>2025-07-20T13:06:42.947</Modified>
     </AppXManifest>
   </ItemGroup>
   <ItemGroup>
@@ -43,11 +43,11 @@
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\workspace\WraithLite\WraithLite\WraithLite.WinUI\bin\x64\Debug\net8.0-windows10.0.19041.0\win10-x64\WraithLite.WinUI.dll">
       <PackagePath>WraithLite.WinUI.dll</PackagePath>
-      <Modified>2025-07-20T03:08:42.289</Modified>
+      <Modified>2025-07-20T13:06:42.746</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\workspace\WraithLite\WraithLite\WraithLite.WinUI\obj\x64\Debug\net8.0-windows10.0.19041.0\win10-x64\apphost.exe">
       <PackagePath>WraithLite.WinUI.exe</PackagePath>
-      <Modified>2025-07-20T03:08:42.292</Modified>
+      <Modified>2025-07-20T13:06:42.749</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\workspace\WraithLite\WraithLite\WraithLite\Resources\Raw\AboutAssets.txt">
       <PackagePath>AboutAssets.txt</PackagePath>
@@ -1099,7 +1099,7 @@
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\workspace\WraithLite\WraithLite\WraithLite\bin\Debug\net8.0\WraithLite.dll">
       <PackagePath>WraithLite.dll</PackagePath>
-      <Modified>2025-07-20T03:13:37.103</Modified>
+      <Modified>2025-07-20T13:15:19.748</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\pREDDY\.nuget\packages\microsoft.maui.controls.compatibility\8.0.100\lib\net8.0-windows10.0.19041\Microsoft.Maui.Controls.Compatibility.pri">
       <PackagePath>Microsoft.Maui.Controls.Compatibility.pri</PackagePath>
