@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,31 +13,27 @@ namespace WraithLite.Services
     {
         private StreamWriter _writer;
 
-        /// <summary>
-        /// Performs the full SGE handshake (K, A, M, N, F, G, P, C, L)
-        /// and returns the host, port, and session key.
-        /// </summary>
         public async Task<(string host, int port, string sessionKey)> FullSgeLoginAsync(
-            string username, string password)
+            string username,
+            string password,
+            string preferredCharacterName = null)
         {
             Debug.WriteLine(">>> [SGE] Starting full SGE handshake (forced GS3)");
 
-            // Latin1 for raw byte fidelity
             var latin1 = Encoding.GetEncoding("ISO-8859-1");
-
             using var client = new TcpClient();
             await client.ConnectAsync("eaccess.play.net", 7900);
-
             using var stream = client.GetStream();
             using var reader = new StreamReader(stream, latin1);
             using var writer = new StreamWriter(stream, latin1) { AutoFlush = true };
+            _writer = writer;
 
             // 1) Challenge
-            await writer.WriteAsync("K\n");
+            await writer.WriteLineAsync("K");
             var challenge = await reader.ReadLineAsync();
             Debug.WriteLine($">>> Challenge: {Escape(challenge)}");
 
-            // 2) Hash password
+            // 2) Hash
             var keyBytes = latin1.GetBytes(challenge);
             var hashBytes = new byte[password.Length];
             for (int i = 0; i < password.Length; i++)
@@ -49,24 +46,24 @@ namespace WraithLite.Services
             Debug.WriteLine($">>> Hash: {Escape(hash)}");
 
             // 3) Authenticate
-            await writer.WriteAsync($"A\t{username}\t{hash}\n");
+            await writer.WriteLineAsync($"A\t{username}\t{hash}");
             var aResp = await reader.ReadLineAsync();
             Debug.WriteLine($">>> AUTH response: {Escape(aResp)}");
             if (!aResp.StartsWith("A\t"))
                 throw new Exception($"Authentication failed: {aResp}");
 
-            // 4) Force‐select GS3
+            // 4) Select GS3
             const string shard = "GS3";
-            await writer.WriteAsync($"N\t{shard}\n");
+            await writer.WriteLineAsync($"N\t{shard}");
             var nResp = await reader.ReadLineAsync();
             Debug.WriteLine($">>> N response: {Escape(nResp)}");
             if (!nResp.StartsWith("N\t"))
                 throw new Exception($"Game select failed: {nResp}");
 
-            // 5) Confirm subscription/payment (F, G, P)
+            // 5) Confirm F/G/P
             foreach (var cmd in new[] { "F", "G", "P" })
             {
-                await writer.WriteAsync($"{cmd}\t{shard}\n");
+                await writer.WriteLineAsync($"{cmd}\t{shard}");
                 var resp = await reader.ReadLineAsync();
                 Debug.WriteLine($">>> {cmd} response: {Escape(resp)}");
                 if (!resp.StartsWith($"{cmd}\t") && cmd != "P")
@@ -74,62 +71,75 @@ namespace WraithLite.Services
             }
 
             // 6) List characters (C)
-            await writer.WriteAsync("C\n");
+            await writer.WriteLineAsync("C");
             var cHeader = await reader.ReadLineAsync();
             Debug.WriteLine($">>> C header: {Escape(cHeader)}");
-            var cols = cHeader.Split('\t', StringSplitOptions.None);
-            if (cols.Length < 2 || !int.TryParse(cols[1], out var count) || count == 0)
+
+            var parts = cHeader.Split('\t', StringSplitOptions.None);
+            if (parts.Length < 6 || !int.TryParse(parts[1], out var charCount) || charCount == 0)
                 throw new Exception($"No characters found on shard {shard}");
 
-            // 7) Read the first character entry
-            var charLine = await reader.ReadLineAsync();   // e.g. "\t12345\tMyChar"
-            Debug.WriteLine($">>> Char entry: {Escape(charLine)}");
-            var charId = charLine.Trim().Split('\t', StringSplitOptions.None)[0];
+            // Build list of (Id,Name)
+            var entries = new List<(string Id, string Name)>();
+            for (int i = 5; i + 1 < parts.Length; i += 2)
+                entries.Add((parts[i], parts[i + 1]));
 
-            // 8) Login character (L)
-            await writer.WriteAsync($"L\t{charId}\tSTORM\n");
+            // Pick preferred or default
+            var chosen = (!string.IsNullOrEmpty(preferredCharacterName))
+                ? entries.FirstOrDefault(e =>
+                    e.Name.Equals(preferredCharacterName, StringComparison.OrdinalIgnoreCase))
+                : default;
+            if (string.IsNullOrEmpty(chosen.Id))
+                chosen = entries[0];
+
+            Debug.WriteLine($">>> Selected Character: {chosen.Id} ({chosen.Name})");
+
+            // 7) Login character (L)
+            await writer.WriteLineAsync($"L\t{chosen.Id}\tSTORM");
             var lResp = await reader.ReadLineAsync();
             Debug.WriteLine($">>> LOGIN response: {Escape(lResp)}");
+            if (!lResp.StartsWith("L\t"))
+                throw new Exception($"Character login failed: {lResp}");
 
-            // 9) Parse final response: L\tGS3\tuser\thost\tport\tsessionKey
-            var tok = lResp.Split('\t', StringSplitOptions.None);
-            var host = tok[3];
-            var port = int.Parse(tok[4]);
-            var sessionKey = tok[5];
+            // 8) Parse final L response dynamically
+            //    Look for GAMEHOST=..., GAMEPORT=..., KEY=...
+            var tokens = lResp.Split('\t', StringSplitOptions.None);
+            string host = null;
+            int port = 0;
+            string sessionKey = null;
+
+            foreach (var tok in tokens)
+            {
+                if (tok.StartsWith("GAMEHOST=", StringComparison.OrdinalIgnoreCase))
+                    host = tok.Substring("GAMEHOST=".Length);
+                else if (tok.StartsWith("GAMEPORT=", StringComparison.OrdinalIgnoreCase)
+                         && int.TryParse(tok.Substring("GAMEPORT=".Length), out var p))
+                    port = p;
+                else if (tok.StartsWith("KEY=", StringComparison.OrdinalIgnoreCase))
+                    sessionKey = tok.Substring("KEY=".Length);
+            }
+
+            if (host == null || port == 0 || sessionKey == null)
+                throw new Exception($"Failed to parse final login response: {lResp}");
+
             Debug.WriteLine($">>> Handshake complete: {host}:{port} key={sessionKey}");
-
             return (host, port, sessionKey);
         }
 
-        // helper to make tabs visible in debug
-        private static string Escape(string s) =>
-            s?
-              .Replace("\t", "\\t")
-              .Replace("\r", "\\r")
-              .Replace("\n", "\\n")
-            ?? "<null>";
-
-
-
-        /// <summary>
-        /// Opens the game socket, sends the session key, and begins streaming output.
-        /// </summary>
         public async Task ConnectToGameAsync(
             string host, int port, string sessionKey,
             Action<string> onOutput)
         {
             var client = new TcpClient();
             await client.ConnectAsync(host, port);
-            var stream = client.GetStream();
             var latin1 = Encoding.GetEncoding("ISO-8859-1");
+            var stream = client.GetStream();
             var reader = new StreamReader(stream, latin1);
             _writer = new StreamWriter(stream, latin1) { AutoFlush = true };
 
-            // Send session key + extra newline
             await _writer.WriteLineAsync(sessionKey);
             await _writer.WriteLineAsync();
 
-            // Stream game output
             _ = Task.Run(async () =>
             {
                 string line;
@@ -138,14 +148,18 @@ namespace WraithLite.Services
             });
         }
 
-        /// <summary>
-        /// Send a command to the live game socket.
-        /// </summary>
         public Task SendCommandAsync(string command)
         {
             if (_writer == null)
                 throw new InvalidOperationException("Not connected to game.");
             return _writer.WriteLineAsync(command);
         }
+
+        private static string Escape(string s) =>
+            s?
+              .Replace("\t", "\\t")
+              .Replace("\r", "\\r")
+              .Replace("\n", "\\n")
+            ?? "<null>";
     }
 }
