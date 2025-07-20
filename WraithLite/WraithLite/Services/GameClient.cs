@@ -1,5 +1,6 @@
 ﻿// GameClient.cs
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
@@ -21,10 +22,11 @@ namespace WraithLite.Services
             using var writer = new StreamWriter(stream) { AutoFlush = true };
 
             // Step 1: Request the challenge key
-            Console.WriteLine("Sending K to request key...");
+            Debug.WriteLine("Sending K to request key...");
             await writer.WriteAsync("K\n");
+            await writer.FlushAsync(); // ensure it actually sends
             string key = await reader.ReadLineAsync();
-            Console.WriteLine($"Received key: {key}");
+            Debug.WriteLine($"Received key: {key}");
 
             if (string.IsNullOrWhiteSpace(key) || key.Length < 32)
                 throw new Exception("Invalid challenge key from SGE.");
@@ -34,13 +36,14 @@ namespace WraithLite.Services
 
             // Step 3: Format login request
             string loginRequest = $"A\t{username}\t{hashedPassword}\tGS\t1\n";
-            Console.WriteLine($"Sending login: {loginRequest.Replace(password, "******")}");
+            Debug.WriteLine($"Sending login: {loginRequest.Replace(password, "******")}");
 
             await writer.WriteAsync(loginRequest);
+            await writer.FlushAsync();
 
             // Step 4: Read and handle response
             string response = await reader.ReadLineAsync();
-            Console.WriteLine($"SGE Response: {response}");
+            Debug.WriteLine($"SGE Response: {response}");
 
             if (response.StartsWith("A\t"))
             {
@@ -65,19 +68,19 @@ namespace WraithLite.Services
         }
 
         // Password hashing function per Simutronics spec
-        private string HashPassword(string password, string key)
+        private static string HashPassword(string password, string key)
         {
-            var hash = new StringBuilder();
+            var result = new StringBuilder();
 
-            for (int i = 0; i < password.Length && i < key.Length; i++)
+            for (int i = 0; i < password.Length; i++)
             {
-                byte p = (byte)(password[i] - 32);
-                byte k = (byte)key[i];
-                byte h = (byte)((p ^ k) + 32);
-                hash.Append((char)h);
+                int p = password[i] - 32;
+                int k = key[i % key.Length];
+                int h = ((p ^ k) + 32) & 0x7F; // keep it in printable ASCII range
+                result.Append((char)h);
             }
 
-            return hash.ToString();
+            return result.ToString();
         }
 
         public async Task ConnectToGameAsync(string host, int port, string key, Action<string> onGameOutput)

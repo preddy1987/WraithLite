@@ -1,4 +1,5 @@
-﻿using WraithLite.Services;
+﻿using System.Diagnostics;
+using WraithLite.Services;
 using WraithLite.ViewModels;
 
 namespace WraithLite
@@ -13,7 +14,7 @@ namespace WraithLite
             {
                 GameOutput.Text += "Connecting to SGE...\n";
                 var token = await _client.GetGameTokenAsync("preddy777", "avamae1212");
-                Console.WriteLine($"Token: {token}");
+                Debug.WriteLine($"Token: {token}");
                 GameOutput.Text += $"Got token: {token}\n";
 
                 var parts = token.Split(':');
