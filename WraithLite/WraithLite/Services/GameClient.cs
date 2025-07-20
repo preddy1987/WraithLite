@@ -14,36 +14,68 @@ namespace WraithLite.Services
         public async Task<string> GetGameTokenAsync(string username, string password)
         {
             using var client = new TcpClient();
-            await client.ConnectAsync("sge.play.net", 7900);
+            await client.ConnectAsync("eaccess.play.net", 7900);
+
             using var stream = client.GetStream();
-            using var writer = new StreamWriter(stream, Encoding.ASCII) { AutoFlush = true };
-            using var reader = new StreamReader(stream, Encoding.ASCII);
+            using var reader = new StreamReader(stream);
+            using var writer = new StreamWriter(stream) { AutoFlush = true };
 
-            var loginString = $"A\t{username}\t{password}\tGS\t1\n";
-            await writer.WriteAsync(loginString);
+            // Step 1: Request the challenge key
+            await writer.WriteAsync("K\n");
+            string key = await reader.ReadLineAsync();
 
-            var result = await reader.ReadLineAsync();
+            if (string.IsNullOrEmpty(key) || key.Length < 32)
+                throw new Exception("Invalid challenge key from SGE.");
 
-            Console.WriteLine($"SGE Response: {result}");
+            // Step 2: Hash the password
+            string hashedPassword = HashPassword(password, key);
 
-            if (result?.StartsWith("A\t") == true)
+            // Step 3: Send login request
+            string loginRequest = $"A\t{username}\t{hashedPassword}\tGS\t1\n";
+            await writer.WriteAsync(loginRequest);
+
+            string response = await reader.ReadLineAsync();
+            Console.WriteLine($"SGE Response: {response}");
+
+            if (string.IsNullOrWhiteSpace(response))
+                throw new Exception("Empty response from SGE.");
+
+            if (response.StartsWith("A\t"))
             {
-                var parts = result.Split('\t');
+                var parts = response.Split('\t');
                 if (parts.Length >= 7)
                 {
-                    return $"{parts[4]}:{parts[5]}:{parts[6]}";
+                    var host = parts[4];
+                    var port = parts[5];
+                    var keyToken = parts[6];
+                    return $"{host}:{port}:{keyToken}";
                 }
-                else
-                {
-                    throw new Exception("Login succeeded but response format was invalid.");
-                }
+                throw new Exception("Malformed success response from SGE.");
             }
-            else if (result?.StartsWith("E\t") == true)
+            else if (response.StartsWith("E\t"))
             {
-                throw new Exception($"Login error from server: {result}");
+                throw new Exception($"Login failed: {response}");
+            }
+            else
+            {
+                throw new Exception($"Unexpected response from SGE: {response}");
+            }
+        }
+
+        // Password hashing function per Simutronics spec
+        private string HashPassword(string password, string key)
+        {
+            var hash = new StringBuilder();
+
+            for (int i = 0; i < password.Length && i < key.Length; i++)
+            {
+                byte p = (byte)(password[i] - 32);
+                byte k = (byte)key[i];
+                byte h = (byte)((p ^ k) + 32);
+                hash.Append((char)h);
             }
 
-            throw new Exception("No valid response from SGE.");
+            return hash.ToString();
         }
 
         public async Task ConnectToGameAsync(string host, int port, string key, Action<string> onGameOutput)

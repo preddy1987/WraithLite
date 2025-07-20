@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WraithLite.Mac")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a99d2c28d3ab921e62c20e9456d744196a572bbc")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9874e3a48edb8960bebf808fbcae4ae6e17dd4ab")]
 [assembly: System.Reflection.AssemblyProductAttribute("WraithLite.Mac")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WraithLite.Mac")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

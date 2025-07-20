@@ -11,7 +11,10 @@ namespace WraithLite
         {
             try
             {
+                GameOutput.Text += "Connecting to SGE...\n";
                 var token = await _client.GetGameTokenAsync("preddy777", "avamae1212");
+                GameOutput.Text += $"Got token: {token}\n";
+
                 var parts = token.Split(':');
                 await _client.ConnectToGameAsync(parts[0], int.Parse(parts[1]), parts[2], OnGameOutput);
             }
