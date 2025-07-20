@@ -21,24 +21,26 @@ namespace WraithLite.Services
             using var writer = new StreamWriter(stream) { AutoFlush = true };
 
             // Step 1: Request the challenge key
+            Console.WriteLine("Sending K to request key...");
             await writer.WriteAsync("K\n");
             string key = await reader.ReadLineAsync();
+            Console.WriteLine($"Received key: {key}");
 
-            if (string.IsNullOrEmpty(key) || key.Length < 32)
+            if (string.IsNullOrWhiteSpace(key) || key.Length < 32)
                 throw new Exception("Invalid challenge key from SGE.");
 
             // Step 2: Hash the password
             string hashedPassword = HashPassword(password, key);
 
-            // Step 3: Send login request
+            // Step 3: Format login request
             string loginRequest = $"A\t{username}\t{hashedPassword}\tGS\t1\n";
+            Console.WriteLine($"Sending login: {loginRequest.Replace(password, "******")}");
+
             await writer.WriteAsync(loginRequest);
 
+            // Step 4: Read and handle response
             string response = await reader.ReadLineAsync();
             Console.WriteLine($"SGE Response: {response}");
-
-            if (string.IsNullOrWhiteSpace(response))
-                throw new Exception("Empty response from SGE.");
 
             if (response.StartsWith("A\t"))
             {
@@ -47,8 +49,8 @@ namespace WraithLite.Services
                 {
                     var host = parts[4];
                     var port = parts[5];
-                    var keyToken = parts[6];
-                    return $"{host}:{port}:{keyToken}";
+                    var gameKey = parts[6];
+                    return $"{host}:{port}:{gameKey}";
                 }
                 throw new Exception("Malformed success response from SGE.");
             }
