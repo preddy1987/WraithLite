@@ -7,6 +7,8 @@ namespace WraithLite
     public partial class MainPage : ContentPage
     {
         private readonly GameClient _client = new();
+        Process _lichProcess;
+        bool _lichRunning = false;
 
         //private async void OnConnectClicked(object sender, EventArgs e)
         //{
@@ -50,6 +52,55 @@ namespace WraithLite
             catch (Exception ex)
             {
                 GameOutput.Text += $"ERROR during SGE login: {ex.Message}\n";
+            }
+        }
+
+        async void OnLichClicked(object sender, EventArgs e)
+        {
+            if (!_lichRunning)
+            {
+                // Start headless Lich5
+                var psi = new ProcessStartInfo
+                {
+                    FileName = @"C:\Users\pREDDY\Desktop\Lich5\headless.bat",
+                    Arguments = $"--login={UsernameEntry.Text} --password={PasswordEntry.Text}",
+                    WorkingDirectory = @"C:\Users\pREDDY\Desktop\Lich5",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    RedirectStandardInput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                _lichProcess = Process.Start(psi);
+                _lichProcess.OutputDataReceived += (s, ev) => {
+                    if (ev.Data != null)
+                        MainThread.BeginInvokeOnMainThread(() => GameOutput.Text += ev.Data + "\n");
+                };
+                _lichProcess.ErrorDataReceived += (s, ev) => {
+                    if (ev.Data != null)
+                        MainThread.BeginInvokeOnMainThread(() => GameOutput.Text += "[ERR] " + ev.Data + "\n");
+                };
+
+                _lichProcess.BeginOutputReadLine();
+                _lichProcess.BeginErrorReadLine();
+
+                _lichRunning = true;
+                LichButton.Text = "Stop Lich";
+            }
+            else
+            {
+                // Stop Lich5
+                try
+                {
+                    _lichProcess.Kill();
+                }
+                catch { /* ignore */ }
+
+                _lichProcess.Dispose();
+                _lichProcess = null;
+                _lichRunning = false;
+                LichButton.Text = "Lich";
             }
         }
 

@@ -5,21 +5,24 @@
              x:Class="WraithLite.MainPage"
              x:DataType="vm:MainViewModel">
 
-    <!--<VerticalStackLayout Padding="10">
-        <ScrollView HeightRequest="400">
-            <Label Text="{Binding Output}" 
-                   FontFamily="Consolas"
-                   FontSize="12"
-                   LineBreakMode="WordWrap" />
-        </ScrollView>
-        <Entry Placeholder="Enter command..." 
-               Text="{Binding InputText}" 
-               Completed="SendCommand" />
-    </VerticalStackLayout>-->
-    <VerticalStackLayout Padding="10">
-        <Button Text="Connect" Clicked="OnConnectClicked" />
-        <Editor x:Name="GameOutput" FontFamily="Consolas" AutoSize="TextChanges" IsReadOnly="True" />
-        <Entry x:Name="CommandEntry" Placeholder="Type command..." Completed="OnCommandEntered"/>
+    <VerticalStackLayout Padding="10" Spacing="10">
+        <!-- Your existing Connect button -->
+        <Button x:Name="ConnectButton"
+          Text="Connect"
+          Clicked="OnConnectClicked" />
+
+        <!-- NEW: Lich button -->
+        <Button x:Name="LichButton"
+          Text="Lich"
+          Clicked="OnLichClicked" />
+
+        <!-- Game UI -->
+        <Editor x:Name="GameOutput"
+          IsReadOnly="True"
+          AutoSize="TextChanges" />
+        <Entry x:Name="CommandEntry"
+         Placeholder="Enter command..."
+         Completed="OnCommandEntered" />
     </VerticalStackLayout>
-    
+
 </ContentPage>
