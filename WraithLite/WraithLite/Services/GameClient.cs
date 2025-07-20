@@ -187,22 +187,17 @@ namespace WraithLite.Services
         // Password hashing function per Simutronics spec
         private static string HashPassword(string password, string key)
         {
-            // get raw bytes of the key just like Ruby.bytes
             var keyBytes = Encoding.ASCII.GetBytes(key);
             var result = new byte[password.Length];
 
             for (int i = 0; i < password.Length; i++)
             {
-                // pw_byte and key_byte are 0–255
-                int p = (password[i] - 32) & 0xFF;
-                int k = keyBytes[i % keyBytes.Length];
-
-                // XOR then add 32, wrap mod 256
-                int h = (p ^ k) + 32;
-                result[i] = (byte)(h & 0xFF);
+                int p = (password[i] - 32) & 0xFF;          // 0–95
+                int k = keyBytes[i % keyBytes.Length];     // wrap the key
+                int h = (p ^ k) + 32;                      // XOR then shift back
+                result[i] = (byte)(h & 0xFF);              // let it overflow exactly like Ruby
             }
 
-            // pack bytes back into a string
             return Encoding.ASCII.GetString(result);
         }
 
