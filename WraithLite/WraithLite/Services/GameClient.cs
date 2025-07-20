@@ -17,7 +17,7 @@ namespace WraithLite.Services
         /// and returns the host, port, and session key.
         /// </summary>
         public async Task<(string host, int port, string sessionKey)> FullSgeLoginAsync(
-            string username, string password)
+            string username, string password, string characterName)
         {
             Debug.WriteLine(">>> [SGE] Starting full SGE handshake");
 
@@ -73,16 +73,21 @@ namespace WraithLite.Services
             if (mLine == null)
                 throw new Exception("SGE did not return a product list.");
 
+            // **DEBUG DUMP** every part so we know where the codes are
+            var debugParts = mLine.Split('\t', StringSplitOptions.None);
+            for (int i = 0; i < debugParts.Length; i++)
+                Debug.WriteLine($">>> [SGE] parts[{i}] = '{debugParts[i]}'");
+
             // 6) Extract the instance code for "GemStone IV"
-            //    mLine format: M\tCODE1\tNAME1\tCODE2\tNAME2\t…
-            var parts = mLine.Split('\t', StringSplitOptions.RemoveEmptyEntries);
+            //    (whatever part[i+1] == "GemStone IV")
             string gameCode = null;
-            for (int i = 1; i + 1 < parts.Length; i += 2)
+            for (int i = 1; i + 1 < debugParts.Length; i++)
             {
-                if (parts[i + 1]
+                if (debugParts[i + 1]
                       .Equals("GemStone IV", StringComparison.OrdinalIgnoreCase))
                 {
-                    gameCode = parts[i];  // e.g. "GS3"
+                    gameCode = debugParts[i];  // e.g. "GS3"
+                    Debug.WriteLine($">>> [SGE] Found GemStone IV at parts[{i}/{i + 1}], code='{gameCode}'");
                     break;
                 }
             }
@@ -90,22 +95,22 @@ namespace WraithLite.Services
                 throw new Exception("Could not find GemStone IV in product list.");
 
             // 7) Select game by its code
-            Debug.WriteLine($">>> [SGE] Selecting game code {gameCode}");
-            await writer.WriteAsync($"N {gameCode}\n");
+            Debug.WriteLine($">>> [SGE] Sending: N {gameCode}");
+            await writer.WriteAsync($"N {gameCode}\t1\n");
             var nResp = await reader.ReadLineAsync();
             Debug.WriteLine($">>> [SGE] N response: [{nResp}]");
-            if (!nResp.StartsWith("N\t"))
-                throw new Exception($"Game select failed: {nResp}");
+            //if (!nResp.StartsWith("N\t"))
+            //    throw new Exception($"Game select failed: {nResp}");
 
             // 8) Confirm subscription/payment (F, G, P)
             foreach (var cmd in new[] { "F", "G", "P" })
             {
                 Debug.WriteLine($">>> [SGE] Sending: {cmd} {gameCode}");
-                await writer.WriteAsync($"{cmd} {gameCode}\n");
+                await writer.WriteAsync($"{cmd} {gameCode}\t1\n");
                 var resp = await reader.ReadLineAsync();
                 Debug.WriteLine($">>> [SGE] {cmd} response: [{resp}]");
-                if (!resp.StartsWith($"{cmd}\t") && cmd != "P")
-                    throw new Exception($"{cmd} check failed: {resp}");
+                //if (!resp.StartsWith($"{cmd}\t") && cmd != "P")
+                //    throw new Exception($"{cmd} check failed: {resp}");
             }
 
             // 9) List characters
@@ -129,10 +134,16 @@ namespace WraithLite.Services
             // 10) Login first character
             var charId = chars[0]
                 .Split('\t', StringSplitOptions.RemoveEmptyEntries)[0];
-            Debug.WriteLine($">>> [SGE] Logging in char ID: {charId}");
+            Debug.WriteLine($">>> [SGE] Sending: L {charId} STORM");
             await writer.WriteAsync($"L {charId} STORM\n");
             var lResp = await reader.ReadLineAsync();
             Debug.WriteLine($">>> [SGE] LOGIN response: [{lResp}]");
+
+            //// 9) Directly log in the known character
+            //Debug.WriteLine($">>> [SGE] Sending: L {characterName} STORM");
+            //await writer.WriteAsync($"L {characterName} STORM\n");
+            //var lResp = await reader.ReadLineAsync();
+            //Debug.WriteLine($">>> [SGE] LOGIN response: [{lResp}]");
 
             // 11) Parse final response
             var tokens = lResp.Split('\t');

@@ -22,6 +22,8 @@
         <Entry x:Name="PasswordEntry"
          Placeholder="Password"
          IsPassword="True" />
+        <Entry x:Name="CharacterName"
+         Placeholder="CharacterName"/>
 
         <!-- Game UI -->
         <Editor x:Name="GameOutput"

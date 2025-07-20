@@ -30,7 +30,7 @@ namespace WraithLite
             try
             {
                 var (host, port, key) = await _client.FullSgeLoginAsync(
-                    UsernameEntry.Text, PasswordEntry.Text);
+                    UsernameEntry.Text, PasswordEntry.Text,CharacterName.Text);
 
                 GameOutput.Text += $"SGE host={host}, port={port}, key={key}\n";
                 GameOutput.Text += "Connecting to game server…\n";
