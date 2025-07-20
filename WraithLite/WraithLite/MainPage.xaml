@@ -1,37 +1,73 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:vm="clr-namespace:WraithLite.ViewModels"
-             x:Class="WraithLite.MainPage"
-             x:DataType="vm:MainViewModel">
+<ContentPage
+    x:Class="WraithLite.MainPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    >
 
-    <VerticalStackLayout Padding="10" Spacing="10">
-        <!-- Existing Connect button -->
-        <Button x:Name="ConnectButton"
-          Text="Connect"
-          Clicked="OnConnectClicked" />
+    <VerticalStackLayout Padding="10" Spacing="8">
 
-        <!-- NEW: Lich button -->
-        <Button x:Name="LichButton"
-          Text="Lich"
-          Clicked="OnLichClicked" />
+        <!-- Credentials -->
+        <Entry
+      x:Name="UsernameEntry"
+      Placeholder="Username"
+      HorizontalOptions="FillAndExpand" />
+        <Entry
+      x:Name="PasswordEntry"
+      Placeholder="Password"
+      IsPassword="True"
+      HorizontalOptions="FillAndExpand" />
 
-        <!-- Credentials entries (if not already present) -->
-        <Entry x:Name="UsernameEntry"
-         Placeholder="Username" />
-        <Entry x:Name="PasswordEntry"
-         Placeholder="Password"
-         IsPassword="True" />
-        <Entry x:Name="CharacterName"
-         Placeholder="CharacterName"/>
+        <!-- Connect / Lich -->
+        <HorizontalStackLayout Spacing="10">
+            <Button
+        x:Name="ConnectButton"
+        Text="Play"
+        Clicked="OnConnectClicked"
+        HorizontalOptions="FillAndExpand" />
+            <Button
+        x:Name="LichButton"
+        Text="Lich"
+        Clicked="OnLichClicked"
+        HorizontalOptions="FillAndExpand" />
+        </HorizontalStackLayout>
 
-        <!-- Game UI -->
-        <Editor x:Name="GameOutput"
-          IsReadOnly="True"
-          AutoSize="TextChanges" />
-        <Entry x:Name="CommandEntry"
-         Placeholder="Enter command..."
-         Completed="OnCommandEntered" />
+        <!-- Game Output -->
+        <ScrollView
+      VerticalOptions="FillAndExpand"
+      BackgroundColor="#F0F0F0"      
+      Padding="5">
+            <Label
+        x:Name="GameOutput"
+        FontFamily="Courier New"
+        FontSize="14"
+        LineBreakMode="NoWrap" 
+                TextColor="Black"/>
+            
+        </ScrollView>
+
+        <!-- Command Entry -->
+        <HorizontalStackLayout Spacing="10">
+            <Entry
+        x:Name="CommandEntry"
+        Placeholder="Enter command"
+        Completed="OnCommandEntered"
+        HorizontalOptions="FillAndExpand" />
+            <Button
+        Text="Send"
+        Clicked="OnCommandEntered" />
+        </HorizontalStackLayout>
+
+        <!-- Test Command Entry -->
+        <HorizontalStackLayout Spacing="10">
+            <Entry
+        x:Name="TestCommandEntry"
+        Placeholder="Test command"
+        HorizontalOptions="FillAndExpand" />
+            <Button
+        Text="Send Test"
+        Clicked="OnTestCommandClicked" />
+        </HorizontalStackLayout>
+
     </VerticalStackLayout>
-
 </ContentPage>

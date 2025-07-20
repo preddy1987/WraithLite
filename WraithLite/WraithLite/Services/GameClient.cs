@@ -17,144 +17,98 @@ namespace WraithLite.Services
         /// and returns the host, port, and session key.
         /// </summary>
         public async Task<(string host, int port, string sessionKey)> FullSgeLoginAsync(
-            string username, string password, string characterName)
+            string username, string password)
         {
-            Debug.WriteLine(">>> [SGE] Starting full SGE handshake");
+            Debug.WriteLine(">>> [SGE] Starting full SGE handshake (forced GS3)");
 
-            // Use Latin1 so bytes 0–255 map directly to chars
+            // Latin1 for raw byte fidelity
             var latin1 = Encoding.GetEncoding("ISO-8859-1");
 
-            // 1) Connect
             using var client = new TcpClient();
             await client.ConnectAsync("eaccess.play.net", 7900);
+
             using var stream = client.GetStream();
             using var reader = new StreamReader(stream, latin1);
             using var writer = new StreamWriter(stream, latin1) { AutoFlush = true };
 
-            // 2) Challenge
-            Debug.WriteLine(">>> [SGE] Sending: K\\n");
+            // 1) Challenge
             await writer.WriteAsync("K\n");
             var challenge = await reader.ReadLineAsync();
-            Debug.WriteLine($">>> [SGE] Received challenge: [{challenge}]");
+            Debug.WriteLine($">>> Challenge: {Escape(challenge)}");
 
-            // 3) Hash password
+            // 2) Hash password
             var keyBytes = latin1.GetBytes(challenge);
             var hashBytes = new byte[password.Length];
             for (int i = 0; i < password.Length; i++)
             {
                 int p = (password[i] - 32) & 0xFF;
                 int k = keyBytes[i % keyBytes.Length];
-                int h = (p ^ k) + 32;
-                hashBytes[i] = (byte)(h & 0xFF);
+                hashBytes[i] = (byte)(((p ^ k) + 32) & 0xFF);
             }
             var hash = latin1.GetString(hashBytes);
-            Debug.WriteLine($">>> [SGE] Computed hash: [{hash}]");
+            Debug.WriteLine($">>> Hash: {Escape(hash)}");
 
-            // 4) Auth
-            Debug.WriteLine(">>> [SGE] Sending AUTH");
+            // 3) Authenticate
             await writer.WriteAsync($"A\t{username}\t{hash}\n");
             var aResp = await reader.ReadLineAsync();
-            Debug.WriteLine($">>> [SGE] AUTH response: [{aResp}]");
+            Debug.WriteLine($">>> AUTH response: {Escape(aResp)}");
             if (!aResp.StartsWith("A\t"))
-                throw new Exception($"SGE auth failed: {aResp}");
+                throw new Exception($"Authentication failed: {aResp}");
 
-            // 5) List products
-            Debug.WriteLine(">>> [SGE] Sending: M\\n (list products)");
-            await writer.WriteAsync("M\n");
-            await writer.FlushAsync();
-
-            //  Read until the M-line
-            string mLine;
-            do
-            {
-                mLine = await reader.ReadLineAsync();
-                Debug.WriteLine($">>> [SGE] M-line: [{mLine}]");
-            } while (mLine != null && !mLine.StartsWith("M\t"));
-            if (mLine == null)
-                throw new Exception("SGE did not return a product list.");
-
-            // **DEBUG DUMP** every part so we know where the codes are
-            var debugParts = mLine.Split('\t', StringSplitOptions.None);
-            for (int i = 0; i < debugParts.Length; i++)
-                Debug.WriteLine($">>> [SGE] parts[{i}] = '{debugParts[i]}'");
-
-            // 6) Extract the instance code for "GemStone IV"
-            //    (whatever part[i+1] == "GemStone IV")
-            string gameCode = null;
-            for (int i = 1; i + 1 < debugParts.Length; i++)
-            {
-                if (debugParts[i + 1]
-                      .Equals("GemStone IV", StringComparison.OrdinalIgnoreCase))
-                {
-                    gameCode = debugParts[i];  // e.g. "GS3"
-                    Debug.WriteLine($">>> [SGE] Found GemStone IV at parts[{i}/{i + 1}], code='{gameCode}'");
-                    break;
-                }
-            }
-            if (string.IsNullOrWhiteSpace(gameCode))
-                throw new Exception("Could not find GemStone IV in product list.");
-
-            // 7) Select game by its code
-            Debug.WriteLine($">>> [SGE] Sending: N {gameCode}");
-            await writer.WriteAsync($"N {gameCode}\t1\n");
+            // 4) Force‐select GS3
+            const string shard = "GS3";
+            await writer.WriteAsync($"N\t{shard}\n");
             var nResp = await reader.ReadLineAsync();
-            Debug.WriteLine($">>> [SGE] N response: [{nResp}]");
-            //if (!nResp.StartsWith("N\t"))
-            //    throw new Exception($"Game select failed: {nResp}");
+            Debug.WriteLine($">>> N response: {Escape(nResp)}");
+            if (!nResp.StartsWith("N\t"))
+                throw new Exception($"Game select failed: {nResp}");
 
-            // 8) Confirm subscription/payment (F, G, P)
+            // 5) Confirm subscription/payment (F, G, P)
             foreach (var cmd in new[] { "F", "G", "P" })
             {
-                Debug.WriteLine($">>> [SGE] Sending: {cmd} {gameCode}");
-                await writer.WriteAsync($"{cmd} {gameCode}\t1\n");
+                await writer.WriteAsync($"{cmd}\t{shard}\n");
                 var resp = await reader.ReadLineAsync();
-                Debug.WriteLine($">>> [SGE] {cmd} response: [{resp}]");
-                //if (!resp.StartsWith($"{cmd}\t") && cmd != "P")
-                //    throw new Exception($"{cmd} check failed: {resp}");
+                Debug.WriteLine($">>> {cmd} response: {Escape(resp)}");
+                if (!resp.StartsWith($"{cmd}\t") && cmd != "P")
+                    throw new Exception($"{cmd} check failed: {resp}");
             }
 
-            // 9) List characters
-            Debug.WriteLine(">>> [SGE] Sending: C\\n (list characters)");
+            // 6) List characters (C)
             await writer.WriteAsync("C\n");
-            await writer.FlushAsync();
             var cHeader = await reader.ReadLineAsync();
-            Debug.WriteLine($">>> [SGE] C header: [{cHeader}]");
+            Debug.WriteLine($">>> C header: {Escape(cHeader)}");
+            var cols = cHeader.Split('\t', StringSplitOptions.None);
+            if (cols.Length < 2 || !int.TryParse(cols[1], out var count) || count == 0)
+                throw new Exception($"No characters found on shard {shard}");
 
-            var chars = new List<string>();
-            string line;
-            while ((line = await reader.ReadLineAsync()) != null
-                   && line.StartsWith("\t"))
-            {
-                Debug.WriteLine($">>> [SGE] Char entry: [{line}]");
-                chars.Add(line.Trim());
-            }
-            if (chars.Count == 0)
-                throw new Exception("No characters found.");
+            // 7) Read the first character entry
+            var charLine = await reader.ReadLineAsync();   // e.g. "\t12345\tMyChar"
+            Debug.WriteLine($">>> Char entry: {Escape(charLine)}");
+            var charId = charLine.Trim().Split('\t', StringSplitOptions.None)[0];
 
-            // 10) Login first character
-            var charId = chars[0]
-                .Split('\t', StringSplitOptions.RemoveEmptyEntries)[0];
-            Debug.WriteLine($">>> [SGE] Sending: L {charId} STORM");
-            await writer.WriteAsync($"L {charId} STORM\n");
+            // 8) Login character (L)
+            await writer.WriteAsync($"L\t{charId}\tSTORM\n");
             var lResp = await reader.ReadLineAsync();
-            Debug.WriteLine($">>> [SGE] LOGIN response: [{lResp}]");
+            Debug.WriteLine($">>> LOGIN response: {Escape(lResp)}");
 
-            //// 9) Directly log in the known character
-            //Debug.WriteLine($">>> [SGE] Sending: L {characterName} STORM");
-            //await writer.WriteAsync($"L {characterName} STORM\n");
-            //var lResp = await reader.ReadLineAsync();
-            //Debug.WriteLine($">>> [SGE] LOGIN response: [{lResp}]");
+            // 9) Parse final response: L\tGS3\tuser\thost\tport\tsessionKey
+            var tok = lResp.Split('\t', StringSplitOptions.None);
+            var host = tok[3];
+            var port = int.Parse(tok[4]);
+            var sessionKey = tok[5];
+            Debug.WriteLine($">>> Handshake complete: {host}:{port} key={sessionKey}");
 
-            // 11) Parse final response
-            var tokens = lResp.Split('\t');
-            var host = tokens[3];
-            var portNum = int.Parse(tokens[4]);
-            var sessionKey = tokens[5];
-            Debug.WriteLine(
-                $">>> [SGE] Handshake complete: {host}:{portNum} key={sessionKey}");
-
-            return (host, portNum, sessionKey);
+            return (host, port, sessionKey);
         }
+
+        // helper to make tabs visible in debug
+        private static string Escape(string s) =>
+            s?
+              .Replace("\t", "\\t")
+              .Replace("\r", "\\r")
+              .Replace("\n", "\\n")
+            ?? "<null>";
+
 
 
         /// <summary>

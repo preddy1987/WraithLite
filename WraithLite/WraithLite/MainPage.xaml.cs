@@ -30,7 +30,7 @@ namespace WraithLite
             try
             {
                 var (host, port, key) = await _client.FullSgeLoginAsync(
-                    UsernameEntry.Text, PasswordEntry.Text,CharacterName.Text);
+                    UsernameEntry.Text, PasswordEntry.Text);
 
                 GameOutput.Text += $"SGE host={host}, port={port}, key={key}\n";
                 GameOutput.Text += "Connecting to game server…\n";
@@ -164,5 +164,35 @@ namespace WraithLite
                 }
             }
         }
+
+        async void OnTestCommandClicked(object sender, EventArgs e)
+        {
+            var cmd = TestCommandEntry.Text?.Trim();
+            if (string.IsNullOrEmpty(cmd))
+                return;
+
+            // Echo it into the output so you can see what you're sending
+            GameOutput.Text += $"> {cmd}\n";
+
+            try
+            {
+                // If Lich is running, send to Lich; otherwise use direct socket
+                if (_lichRunning && _lichProcess != null)
+                {
+                    await _lichProcess.StandardInput.WriteLineAsync(cmd);
+                }
+                else
+                {
+                    await _client.SendCommandAsync(cmd);
+                }
+            }
+            catch (Exception ex)
+            {
+                GameOutput.Text += $"[Error] Failed to send test command: {ex.Message}\n";
+            }
+
+            TestCommandEntry.Text = "";
+        }
+
     }
 }
