@@ -12,120 +12,95 @@ namespace WraithLite.Services
     {
         private StreamWriter _writer;
 
-        public async Task<(string host, int port, string sessionKey)> FullSgeLoginAsync(
-            string username, string password)
+        public async Task<(string host, int port, string sessionKey)> FullSgeLoginAsync(string username, string password)
         {
             Debug.WriteLine(">>> [SGE] Starting full SGE handshake");
 
-            // 1) Connect
             using var client = new TcpClient();
             await client.ConnectAsync("eaccess.play.net", 7900);
             using var stream = client.GetStream();
             using var reader = new StreamReader(stream, Encoding.ASCII);
             using var writer = new StreamWriter(stream, Encoding.ASCII) { AutoFlush = true };
 
-            // 2) Challenge
-            Debug.WriteLine(">>> [SGE] Sending: K\\n");
+            // Step 1: Challenge
             await writer.WriteAsync("K\n");
             var challenge = await reader.ReadLineAsync();
             Debug.WriteLine($">>> [SGE] Received challenge: [{challenge}]");
 
-            // 3) Hash (Ruby‑style)
-            var keyBytes = Encoding.ASCII.GetBytes(challenge);
-            var hashBytes = new byte[password.Length];
-            for (int i = 0; i < password.Length; i++)
-            {
-                int p = (password[i] - 32) & 0xFF;
-                int k = keyBytes[i % keyBytes.Length];
-                int h = (p ^ k) + 32;
-                hashBytes[i] = (byte)(h & 0xFF);
-            }
-            var hash = Encoding.ASCII.GetString(hashBytes);
-            Debug.WriteLine($">>> [SGE] Computed hash: [{hash}]");
-
-            // 4) Auth (A <user> <hash> GS 1)
-            var authCmd = $"A\t{username}\t{hash}\tGS\t1\n";
-            Debug.WriteLine($">>> [SGE] Sending AUTH: [{authCmd.Replace(hash, "****")}]");
+            // Step 2: Password Hash
+            var hash = HashPassword(password, challenge);
+            var authCmd = $"A\t{username}\t{hash}\n";
+            Debug.WriteLine($">>> [SGE] Sending AUTH");
             await writer.WriteAsync(authCmd);
-            var aResp = await reader.ReadLineAsync();
-            Debug.WriteLine($">>> [SGE] AUTH response: [{aResp}]");
-            if (!aResp.StartsWith("A\tGSIV"))
-                throw new Exception($"Auth failed: {aResp}");
+            var authResp = await reader.ReadLineAsync();
+            if (!authResp.StartsWith("A\t"))
+                throw new Exception($"SGE auth failed: {authResp}");
 
-            // 5) List products (M)
-            Debug.WriteLine(">>> [SGE] Sending: M\\n (list products)");
+            // Step 3: List Products
             await writer.WriteAsync("M\n");
-            string mLine;
-            do
+            string line;
+            while ((line = await reader.ReadLineAsync()) != null)
             {
-                mLine = await reader.ReadLineAsync();
-                Debug.WriteLine($">>> [SGE] M-line: [{mLine}]");
-            } while (mLine != null && !mLine.StartsWith("M\t"));
+                if (line.StartsWith("M\t"))
+                    break;
+            }
 
-            // 6) Find numeric slot of “GemStone IV”
-            var parts = mLine.Split('\t', StringSplitOptions.RemoveEmptyEntries);
-            int slot = -1;
-            for (int idx = 1, count = 1; idx < parts.Length; idx += 2, count++)
+            // Step 4: Parse game list, get GemStone IV code
+            string gemstoneCode = null;
+            var parts = line.Split('\t');
+            for (int i = 1; i < parts.Length - 1; i += 2)
             {
-                if (parts[idx + 1].Equals("GemStone IV", StringComparison.OrdinalIgnoreCase))
+                if (parts[i + 1].Equals("GemStone IV", StringComparison.OrdinalIgnoreCase))
                 {
-                    slot = count;
+                    gemstoneCode = parts[i];
                     break;
                 }
             }
-            if (slot < 1)
-                throw new Exception("Could not find GemStone IV in product list.");
 
-            Debug.WriteLine($">>> [SGE] Selecting slot #{slot}");
-            // 7) Select game (N <slot>)
-            await writer.WriteAsync($"N {slot}\n");
+            if (string.IsNullOrEmpty(gemstoneCode))
+                throw new Exception("GemStone IV not found in SGE game list.");
+
+            // Step 5: Select game by code
+            await writer.WriteAsync($"N {gemstoneCode}\n");
             var nResp = await reader.ReadLineAsync();
-            Debug.WriteLine($">>> [SGE] N response: [{nResp}]");
             if (!nResp.StartsWith("N\t"))
                 throw new Exception($"Game select failed: {nResp}");
 
-            // 8) Confirm subscription/payment (F, G, P)
+            // Step 6: Validate subscription/product
             foreach (var cmd in new[] { "F", "G", "P" })
             {
-                Debug.WriteLine($">>> [SGE] Sending: {cmd} {slot}\\n");
-                await writer.WriteAsync($"{cmd} {slot}\n");
+                await writer.WriteAsync($"{cmd} {gemstoneCode}\n");
                 var resp = await reader.ReadLineAsync();
-                Debug.WriteLine($">>> [SGE] {cmd} response: [{resp}]");
-                if (!resp.StartsWith($"{cmd}\t"))
-                    throw new Exception($"{cmd} failed: {resp}");
+                if (!resp.StartsWith($"{cmd}\t") && !resp.StartsWith("P\t")) // P is special
+                    throw new Exception($"{cmd} check failed: {resp}");
             }
 
-            // 9) List characters (C)
-            Debug.WriteLine(">>> [SGE] Sending: C\\n (list characters)");
+            // Step 7: Get character list
             await writer.WriteAsync("C\n");
             var cHeader = await reader.ReadLineAsync();
-            Debug.WriteLine($">>> [SGE] C header: [{cHeader}]");
-
             var chars = new List<string>();
-            string line;
             while ((line = await reader.ReadLineAsync()) != null && line.StartsWith("\t"))
-            {
-                Debug.WriteLine($">>> [SGE] Char entry: [{line}]");
                 chars.Add(line.Trim());
-            }
+
             if (chars.Count == 0)
-                throw new Exception("No characters returned.");
+                throw new Exception("No characters found");
 
-            // 10) Login first character (L <charId> STORM)
-            var charId = chars[0].Split('\t', StringSplitOptions.RemoveEmptyEntries)[0];
-            Debug.WriteLine($">>> [SGE] Logging in char ID: {charId}");
+            var charId = chars[0].Split('\t')[0];
+
+            // Step 8: Login character
             await writer.WriteAsync($"L {charId} STORM\n");
-            var lResp = await reader.ReadLineAsync();
-            Debug.WriteLine($">>> [SGE] LOGIN response: [{lResp}]");
+            var loginResp = await reader.ReadLineAsync();
+            var tokens = loginResp.Split('\t');
 
-            // 11) Parse host, port, key
-            var f = lResp.Split('\t');
-            var host = f[3];
-            var port = int.Parse(f[4]);
-            var sessionKey = f[5];
-            Debug.WriteLine($">>> [SGE] Handshake complete: host={host}, port={port}, key={sessionKey}");
+            if (tokens.Length < 6)
+                throw new Exception($"Bad login response: {loginResp}");
 
-            return (host, port, sessionKey);
+            var host = tokens[3];
+            var port = int.Parse(tokens[4]);
+            var key = tokens[5];
+
+            Debug.WriteLine($">>> [SGE] Login successful: {host}:{port} key={key}");
+            return (host, port, key);
         }
 
         public async Task<string> GetGameTokenAsync(string username, string password)
@@ -187,22 +162,14 @@ namespace WraithLite.Services
         }
 
         // Password hashing function per Simutronics spec
-        private static string HashPassword(string password, string key)
+        public static string HashPassword(string password, string challenge)
         {
-            // Ruby does: hash_bytes = password.bytes.each_with_index.map { |pw, i|
-            //    ((pw-32) ^ key_bytes[i % key_bytes.size]) + 32 } and then pack("C*")
-            var keyBytes = Encoding.ASCII.GetBytes(key);
-            var result = new byte[password.Length];
-
+            var xor = new char[password.Length];
             for (int i = 0; i < password.Length; i++)
-            {
-                int p = (password[i] - 32) & 0xFF;          // bring into 0–95 range
-                int k = keyBytes[i % keyBytes.Length];     // wrap the key
-                int h = (p ^ k) + 32;                      // XOR then shift back
-                result[i] = (byte)(h & 0xFF);              // allow full 0–255 overflow
-            }
+                xor[i] = (char)(password[i] ^ challenge[i % challenge.Length]);
 
-            return Encoding.ASCII.GetString(result);
+            var hash = Convert.ToBase64String(Encoding.ASCII.GetBytes(xor));
+            return hash.Replace('\n', ' ').Trim(); // sanitize just in case
         }
 
         public async Task ConnectToGameAsync(string host, int port, string key, Action<string> onGameOutput)

@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "C:\\workspace\\WraithLite\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{EACBE7FF-DCB0-4F1B-A20D-45579B1C13D7}|WraithLite\\WraithLite\\WraithLite.csproj|c:\\workspace\\wraithlite\\wraithlite\\wraithlite\\mainpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{EACBE7FF-DCB0-4F1B-A20D-45579B1C13D7}|WraithLite\\WraithLite\\WraithLite.csproj|solutionrelative:wraithlite\\wraithlite\\mainpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{EACBE7FF-DCB0-4F1B-A20D-45579B1C13D7}|WraithLite\\WraithLite\\WraithLite.csproj|c:\\workspace\\wraithlite\\wraithlite\\wraithlite\\mainpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{EACBE7FF-DCB0-4F1B-A20D-45579B1C13D7}|WraithLite\\WraithLite\\WraithLite.csproj|solutionrelative:wraithlite\\wraithlite\\mainpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EACBE7FF-DCB0-4F1B-A20D-45579B1C13D7}|WraithLite\\WraithLite\\WraithLite.csproj|c:\\workspace\\wraithlite\\wraithlite\\wraithlite\\mainpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{EACBE7FF-DCB0-4F1B-A20D-45579B1C13D7}|WraithLite\\WraithLite\\WraithLite.csproj|solutionrelative:wraithlite\\wraithlite\\mainpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{EACBE7FF-DCB0-4F1B-A20D-45579B1C13D7}|WraithLite\\WraithLite\\WraithLite.csproj|c:\\workspace\\wraithlite\\wraithlite\\wraithlite\\services\\gameclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -26,11 +26,11 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "MainPage.xaml",
               "DocumentMoniker": "C:\\workspace\\WraithLite\\WraithLite\\WraithLite\\MainPage.xaml",
               "RelativeDocumentMoniker": "WraithLite\\WraithLite\\MainPage.xaml",
@@ -43,13 +43,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "MainPage.xaml.cs",
               "DocumentMoniker": "C:\\workspace\\WraithLite\\WraithLite\\WraithLite\\MainPage.xaml.cs",
               "RelativeDocumentMoniker": "WraithLite\\WraithLite\\MainPage.xaml.cs",
               "ToolTip": "C:\\workspace\\WraithLite\\WraithLite\\WraithLite\\MainPage.xaml.cs",
               "RelativeToolTip": "WraithLite\\WraithLite\\MainPage.xaml.cs",
-              "ViewState": "AgIAAFIAAAAAAAAAAAAkwH4AAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAB0AAAAAAAAAAAAQwDQAAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-07-19T21:33:51.894Z",
               "EditorCaption": ""

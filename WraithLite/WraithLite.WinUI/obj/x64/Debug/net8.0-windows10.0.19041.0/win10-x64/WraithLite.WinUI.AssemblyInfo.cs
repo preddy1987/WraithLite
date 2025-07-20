@@ -18,7 +18,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WraithLite.WinUI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+36e5265f38490e87b06e2003e914e408c9b898c2")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c15fa5b5fc939834e7ef85c8cf0371f899d61e86")]
 [assembly: System.Reflection.AssemblyProductAttribute("WraithLite.WinUI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WraithLite.WinUI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
