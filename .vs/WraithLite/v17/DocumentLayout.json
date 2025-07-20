@@ -11,12 +11,12 @@
       "RelativeMoniker": "D:0:0:{EACBE7FF-DCB0-4F1B-A20D-45579B1C13D7}|WraithLite\\WraithLite\\WraithLite.csproj|solutionrelative:wraithlite\\wraithlite\\services\\lichservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{EACBE7FF-DCB0-4F1B-A20D-45579B1C13D7}|WraithLite\\WraithLite\\WraithLite.csproj|c:\\workspace\\wraithlite\\wraithlite\\wraithlite\\mainpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{EACBE7FF-DCB0-4F1B-A20D-45579B1C13D7}|WraithLite\\WraithLite\\WraithLite.csproj|solutionrelative:wraithlite\\wraithlite\\mainpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{EACBE7FF-DCB0-4F1B-A20D-45579B1C13D7}|WraithLite\\WraithLite\\WraithLite.csproj|c:\\workspace\\wraithlite\\wraithlite\\wraithlite\\mainpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{EACBE7FF-DCB0-4F1B-A20D-45579B1C13D7}|WraithLite\\WraithLite\\WraithLite.csproj|solutionrelative:wraithlite\\wraithlite\\mainpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EACBE7FF-DCB0-4F1B-A20D-45579B1C13D7}|WraithLite\\WraithLite\\WraithLite.csproj|c:\\workspace\\wraithlite\\wraithlite\\wraithlite\\mainpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EACBE7FF-DCB0-4F1B-A20D-45579B1C13D7}|WraithLite\\WraithLite\\WraithLite.csproj|solutionrelative:wraithlite\\wraithlite\\mainpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -30,7 +30,7 @@
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 2,
               "Title": "MainPage.xaml",
               "DocumentMoniker": "C:\\workspace\\WraithLite\\WraithLite\\WraithLite\\MainPage.xaml",
               "RelativeDocumentMoniker": "WraithLite\\WraithLite\\MainPage.xaml",
@@ -43,13 +43,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "MainPage.xaml.cs",
               "DocumentMoniker": "C:\\workspace\\WraithLite\\WraithLite\\WraithLite\\MainPage.xaml.cs",
               "RelativeDocumentMoniker": "WraithLite\\WraithLite\\MainPage.xaml.cs",
               "ToolTip": "C:\\workspace\\WraithLite\\WraithLite\\WraithLite\\MainPage.xaml.cs",
               "RelativeToolTip": "WraithLite\\WraithLite\\MainPage.xaml.cs",
-              "ViewState": "AgIAAAgAAAAAAAAAAAAQwBAAAAAVAAAAAAAAAA==",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAQwDoAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-07-19T21:33:51.894Z",
               "EditorCaption": ""
@@ -62,7 +62,7 @@
               "RelativeDocumentMoniker": "WraithLite\\WraithLite\\Services\\GameClient.cs",
               "ToolTip": "C:\\workspace\\WraithLite\\WraithLite\\WraithLite\\Services\\GameClient.cs",
               "RelativeToolTip": "WraithLite\\WraithLite\\Services\\GameClient.cs",
-              "ViewState": "AgIAACUAAAAAAAAAAAAAwFMAAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAACQAAAAAAAAAAAAAwFgAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-07-19T22:37:35.56Z",
               "EditorCaption": ""
@@ -75,7 +75,7 @@
               "RelativeDocumentMoniker": "WraithLite\\WraithLite\\Services\\LichService.cs",
               "ToolTip": "C:\\workspace\\WraithLite\\WraithLite\\WraithLite\\Services\\LichService.cs",
               "RelativeToolTip": "WraithLite\\WraithLite\\Services\\LichService.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAMwBkAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-07-19T21:37:46.688Z",
               "EditorCaption": ""

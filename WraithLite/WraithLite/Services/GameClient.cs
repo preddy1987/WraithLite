@@ -70,17 +70,22 @@ namespace WraithLite.Services
         // Password hashing function per Simutronics spec
         private static string HashPassword(string password, string key)
         {
-            var result = new StringBuilder();
+            var sb = new StringBuilder();
 
-            for (int i = 0; i < password.Length; i++)
+            for (int i = 0; i < password.Length && i < key.Length; i++)
             {
                 int p = password[i] - 32;
-                int k = key[i % key.Length];
-                int h = ((p ^ k) + 32) & 0x7F; // keep it in printable ASCII range
-                result.Append((char)h);
+                int k = key[i];
+                int h = (p ^ k) + 32;
+
+                // Clamp result to printable ASCII (32–126)
+                if (h < 32) h = 32;
+                if (h > 126) h = 126;
+
+                sb.Append((char)h);
             }
 
-            return result.ToString();
+            return sb.ToString();
         }
 
         public async Task ConnectToGameAsync(string host, int port, string key, Action<string> onGameOutput)
