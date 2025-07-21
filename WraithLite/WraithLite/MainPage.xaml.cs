@@ -1,7 +1,6 @@
-﻿using Microsoft.Maui.Controls;
+using Microsoft.Maui.Controls;
 using System;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using WraithLite.Services;
 
 namespace WraithLite
@@ -10,13 +9,12 @@ namespace WraithLite
     {
         private readonly GameClient _client = new();
         private bool _isConnected = false;
+        private string _username;
+        private string _password;
 
         public MainPage()
         {
             InitializeComponent();
-            SendButton.Clicked += OnSendClicked;
-            ConnectButton.Clicked += OnConnectClicked;
-            LichButton.Clicked += OnLichClicked;
         }
 
         private async void OnConnectClicked(object sender, EventArgs e)
@@ -25,13 +23,28 @@ namespace WraithLite
 
             try
             {
-                // These could be moved to text entries for dynamic input
-                var (host, port, sessionKey) = await _client.FullSgeLoginAsync("preddy777", "avamae1212");
+                // Show login modal and await credentials
+                var loginPage = new LoginModalPage();
+                loginPage.LoginCompleted += async (s, args) =>
+                {
+                    _username = args.Username;
+                    _password = args.Password;
 
-                await _client.ConnectToGameAsync(host, port, sessionKey, OnGameOutputReceived);
+                    try
+                    {
+                        var (host, port, sessionKey) = await _client.FullSgeLoginAsync(_username, _password);
+                        await _client.ConnectToGameAsync(host, port, sessionKey, OnGameOutputReceived);
 
-                AppendToStory(">>> Connected to game server.");
-                _isConnected = true;
+                        AppendToStory(">>> Connected to game server.");
+                        _isConnected = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        AppendToStory($"ERROR: {ex.Message}");
+                    }
+                };
+
+                await Navigation.PushModalAsync(loginPage);
             }
             catch (Exception ex)
             {
@@ -39,7 +52,7 @@ namespace WraithLite
             }
         }
 
-        private async void OnSendClicked(object sender, EventArgs e)
+        private async void OnCommandEntered(object sender, EventArgs e)
         {
             var command = CommandEntry.Text;
             if (!string.IsNullOrWhiteSpace(command))
@@ -53,13 +66,11 @@ namespace WraithLite
         private void OnLichClicked(object sender, EventArgs e)
         {
             AppendToStory("Lich integration not implemented yet.");
-            // Placeholder for launching or connecting to lich5 integration
         }
 
         private void OnGameOutputReceived(string line)
         {
-            // You can route more precisely with smarter parsing
-            MainThread.BeginInvokeOnMainThread(() =>
+            Dispatcher.Dispatch(() =>
             {
                 if (line.Contains("thoughtfully"))
                     AppendToThoughts(line);
@@ -72,17 +83,41 @@ namespace WraithLite
 
         private void AppendToStory(string line)
         {
-            StoryOutput.Text += line + Environment.NewLine;
+            var label = new Label
+            {
+                Text = line,
+                FontFamily = "Courier New",
+                FontSize = 14,
+                TextColor = Colors.White
+            };
+            StoryOutputStack?.Children.Add(label);
+            StoryScroll?.ScrollToAsync(label, ScrollToPosition.End, true);
         }
 
         private void AppendToThoughts(string line)
         {
-            ThoughtsOutput.Text += line + Environment.NewLine;
+            var label = new Label
+            {
+                Text = line,
+                FontFamily = "Courier New",
+                FontSize = 14,
+                TextColor = Colors.White
+            };
+            ThoughtsOutputStack?.Children.Add(label);
+            ThoughtsScroll?.ScrollToAsync(label, ScrollToPosition.End, true);
         }
 
         private void AppendToSpeech(string line)
         {
-            SpeechOutput.Text += line + Environment.NewLine;
+            var label = new Label
+            {
+                Text = line,
+                FontFamily = "Courier New",
+                FontSize = 14,
+                TextColor = Colors.White
+            };
+            SpeechOutputStack?.Children.Add(label);
+            SpeechScroll?.ScrollToAsync(label, ScrollToPosition.End, true);
         }
     }
 }

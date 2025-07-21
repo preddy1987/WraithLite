@@ -29,25 +29,25 @@
     <AppXManifest Include="C:\workspace\WraithLite\WraithLite\WraithLite.WinUI\bin\x64\Debug\net8.0-windows10.0.19041.0\win10-x64\AppxManifest.xml">
       <PackagePath>AppxManifest.xml</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2025-07-21T00:48:31.779</Modified>
+      <Modified>2025-07-21T14:07:45.579</Modified>
     </AppXManifest>
   </ItemGroup>
   <ItemGroup>
     <AppxPackagedFile Include="C:\workspace\WraithLite\WraithLite\WraithLite.WinUI\bin\x64\Debug\net8.0-windows10.0.19041.0\win10-x64\resources.pri">
       <PackagePath>resources.pri</PackagePath>
-      <Modified>2025-07-21T00:48:31.539</Modified>
+      <Modified>2025-07-21T14:07:45.346</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\workspace\WraithLite\WraithLite\WraithLite.WinUI\bin\x64\Debug\net8.0-windows10.0.19041.0\win10-x64\WraithLite.WinUI.runtimeconfig.json">
       <PackagePath>WraithLite.WinUI.runtimeconfig.json</PackagePath>
-      <Modified>2025-07-21T00:48:31.433</Modified>
+      <Modified>2025-07-21T14:07:45.259</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\workspace\WraithLite\WraithLite\WraithLite.WinUI\bin\x64\Debug\net8.0-windows10.0.19041.0\win10-x64\WraithLite.WinUI.dll">
       <PackagePath>WraithLite.WinUI.dll</PackagePath>
-      <Modified>2025-07-21T00:48:31.268</Modified>
+      <Modified>2025-07-21T14:07:44.909</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\workspace\WraithLite\WraithLite\WraithLite.WinUI\obj\x64\Debug\net8.0-windows10.0.19041.0\win10-x64\apphost.exe">
       <PackagePath>WraithLite.WinUI.exe</PackagePath>
-      <Modified>2025-07-21T00:48:31.271</Modified>
+      <Modified>2025-07-21T14:07:44.918</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\workspace\WraithLite\WraithLite\WraithLite\Resources\Raw\AboutAssets.txt">
       <PackagePath>AboutAssets.txt</PackagePath>
@@ -61,29 +61,29 @@
       <PackagePath>OpenSans-Semibold.ttf</PackagePath>
       <Modified>2025-07-20T20:52:40.548</Modified>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\workspace\WraithLite\WraithLite\WraithLite.WinUI\obj\x64\Debug\net8.0-windows10.0.19041.0\win10-x64\resizetizer\r\dotnet_bot.scale-100.png">
-      <PackagePath>dotnet_bot.scale-100.png</PackagePath>
-      <Modified>2025-07-20T20:53:10.147</Modified>
-    </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\workspace\WraithLite\WraithLite\WraithLite.WinUI\obj\x64\Debug\net8.0-windows10.0.19041.0\win10-x64\resizetizer\r\dotnet_bot.scale-125.png">
-      <PackagePath>dotnet_bot.scale-125.png</PackagePath>
-      <Modified>2025-07-20T20:53:10.147</Modified>
-    </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\workspace\WraithLite\WraithLite\WraithLite.WinUI\obj\x64\Debug\net8.0-windows10.0.19041.0\win10-x64\resizetizer\r\dotnet_bot.scale-150.png">
-      <PackagePath>dotnet_bot.scale-150.png</PackagePath>
-      <Modified>2025-07-20T20:53:10.147</Modified>
+    <AppxPackagedFile Include="C:\workspace\WraithLite\WraithLite\WraithLite.WinUI\obj\x64\Debug\net8.0-windows10.0.19041.0\win10-x64\resizetizer\r\dotnet_bot.scale-400.png">
+      <PackagePath>dotnet_bot.scale-400.png</PackagePath>
+      <Modified>2025-07-21T14:07:44.570</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\workspace\WraithLite\WraithLite\WraithLite.WinUI\obj\x64\Debug\net8.0-windows10.0.19041.0\win10-x64\resizetizer\r\dotnet_bot.scale-200.png">
       <PackagePath>dotnet_bot.scale-200.png</PackagePath>
-      <Modified>2025-07-20T20:53:10.146</Modified>
+      <Modified>2025-07-21T14:07:44.570</Modified>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\workspace\WraithLite\WraithLite\WraithLite.WinUI\obj\x64\Debug\net8.0-windows10.0.19041.0\win10-x64\resizetizer\r\dotnet_bot.scale-400.png">
-      <PackagePath>dotnet_bot.scale-400.png</PackagePath>
-      <Modified>2025-07-20T20:53:10.146</Modified>
+    <AppxPackagedFile Include="C:\workspace\WraithLite\WraithLite\WraithLite.WinUI\obj\x64\Debug\net8.0-windows10.0.19041.0\win10-x64\resizetizer\r\dotnet_bot.scale-150.png">
+      <PackagePath>dotnet_bot.scale-150.png</PackagePath>
+      <Modified>2025-07-21T14:07:44.570</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\workspace\WraithLite\WraithLite\WraithLite.WinUI\obj\x64\Debug\net8.0-windows10.0.19041.0\win10-x64\resizetizer\r\dotnet_bot.scale-125.png">
+      <PackagePath>dotnet_bot.scale-125.png</PackagePath>
+      <Modified>2025-07-21T14:07:44.570</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\workspace\WraithLite\WraithLite\WraithLite.WinUI\obj\x64\Debug\net8.0-windows10.0.19041.0\win10-x64\resizetizer\r\dotnet_bot.scale-100.png">
+      <PackagePath>dotnet_bot.scale-100.png</PackagePath>
+      <Modified>2025-07-21T14:07:44.570</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\workspace\WraithLite\WraithLite\WraithLite.WinUI\bin\x64\Debug\net8.0-windows10.0.19041.0\win10-x64\WraithLite.WinUI.deps.json">
       <PackagePath>WraithLite.WinUI.deps.json</PackagePath>
-      <Modified>2025-07-21T00:48:31.387</Modified>
+      <Modified>2025-07-21T14:07:45.155</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\pREDDY\.nuget\packages\microsoft.netcore.app.runtime.win-x64\8.0.12\runtimes\win-x64\lib\net8.0\Microsoft.CSharp.dll">
       <PackagePath>Microsoft.CSharp.dll</PackagePath>
@@ -1099,7 +1099,7 @@
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\workspace\WraithLite\WraithLite\WraithLite\bin\Debug\net8.0\WraithLite.dll">
       <PackagePath>WraithLite.dll</PackagePath>
-      <Modified>2025-07-21T00:48:29.091</Modified>
+      <Modified>2025-07-21T14:11:20.516</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\pREDDY\.nuget\packages\microsoft.maui.controls.compatibility\8.0.100\lib\net8.0-windows10.0.19041\Microsoft.Maui.Controls.Compatibility.pri">
       <PackagePath>Microsoft.Maui.Controls.Compatibility.pri</PackagePath>

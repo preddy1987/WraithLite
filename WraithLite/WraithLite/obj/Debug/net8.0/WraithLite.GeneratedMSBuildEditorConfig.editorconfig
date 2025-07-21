@@ -32,6 +32,12 @@ build_metadata.AdditionalFiles.ManifestResourceName = WraithLite.MainPage.xaml
 build_metadata.AdditionalFiles.TargetPath = MainPage.xaml
 build_metadata.AdditionalFiles.RelativePath = MainPage.xaml
 
+[C:/workspace/WraithLite/WraithLite/WraithLite/Modals/LoginModalPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = WraithLite.Modals.LoginModalPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Modals\LoginModalPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Modals\LoginModalPage.xaml
+
 [C:/workspace/WraithLite/WraithLite/WraithLite/Resources/Styles/Colors.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = WraithLite.Resources.Styles.Colors.xaml

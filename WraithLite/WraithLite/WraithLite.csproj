@@ -31,4 +31,10 @@
 	  <Folder Include="Platforms\Windows\" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <MauiXaml Update="Modals\LoginModalPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	</ItemGroup>
+
 </Project>
