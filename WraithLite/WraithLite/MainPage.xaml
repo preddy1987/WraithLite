@@ -101,12 +101,13 @@
         <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" ColumnDefinitions="*,Auto" ColumnSpacing="10">
             <!-- Command text entry -->
             <Entry x:Name="CommandEntry" Grid.Column="0"
-                   Placeholder="Enter command..." Completed="OnCommandEntered"
+                   Placeholder="Enter command..." Completed="OnSendClicked"
                    FontFamily="Courier New" FontSize="14"
                    TextColor="{StaticResource White}" BackgroundColor="{StaticResource OffBlack}"
                    HorizontalOptions="FillAndExpand" />
             <!-- Send button -->
-            <Button Text="Send" Grid.Column="1" Clicked="OnCommandEntered"
+            <Button x:Name="SendButton"
+                    Text="Send" Grid.Column="1" Clicked="OnSendClicked"
                     FontFamily="Courier New" FontSize="14"
                     BackgroundColor="{StaticResource AccentColor}" TextColor="Black"
                     CornerRadius="5" Padding="12,6" />
