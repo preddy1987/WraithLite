@@ -1,73 +1,117 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage
-    x:Class="WraithLite.MainPage"
+﻿<ContentPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    >
+    x:Class="WraithLite.MainPage"
+    BackgroundColor="{StaticResource Black}">
 
-    <VerticalStackLayout Padding="10" Spacing="8">
+    <!-- Define accent color for orange-themed highlights -->
+    <ContentPage.Resources>
+        <Color x:Key="AccentColor">#FF8C00</Color>
+    </ContentPage.Resources>
 
-        <!-- Credentials -->
-        <Entry
-      x:Name="UsernameEntry"
-      Placeholder="Username"
-      HorizontalOptions="FillAndExpand" />
-        <Entry
-      x:Name="PasswordEntry"
-      Placeholder="Password"
-      IsPassword="True"
-      HorizontalOptions="FillAndExpand" />
+    <!-- Main layout grid:
+         Row 0 - Login controls, Row 1 - Output windows, Row 2 - Command input bar.
+         Two columns: left (main Story window) and right (auxiliary windows for Thoughts/Speech). -->
+    <Grid Padding="10" RowSpacing="8" ColumnSpacing="8"
+          RowDefinitions="Auto,*,Auto"
+          ColumnDefinitions="2*,*">
 
-        <!-- Connect / Lich -->
-        <HorizontalStackLayout Spacing="10">
-            <Button
-        x:Name="ConnectButton"
-        Text="Play"
-        Clicked="OnConnectClicked"
-        HorizontalOptions="FillAndExpand" />
-            <Button
-        x:Name="LichButton"
-        Text="Lich"
-        Clicked="OnLichClicked"
-        HorizontalOptions="FillAndExpand" />
-        </HorizontalStackLayout>
+        <!-- Row 0: Credentials input and Connect buttons -->
+        <VerticalStackLayout Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Spacing="8">
+            <!-- Username and Password fields -->
+            <Entry x:Name="UsernameEntry" Placeholder="Username"
+                   FontFamily="Courier New" FontSize="14"
+                   HorizontalOptions="FillAndExpand" />
+            <Entry x:Name="PasswordEntry" Placeholder="Password" IsPassword="True"
+                   FontFamily="Courier New" FontSize="14"
+                   HorizontalOptions="FillAndExpand" />
+            <!-- Connect (Play) and Lich buttons -->
+            <HorizontalStackLayout Spacing="10">
+                <Button x:Name="ConnectButton" Text="Play" Clicked="OnConnectClicked"
+                        FontFamily="Courier New" FontSize="14"
+                        BackgroundColor="{StaticResource AccentColor}" TextColor="Black"
+                        HorizontalOptions="FillAndExpand" />
+                <Button x:Name="LichButton" Text="Lich" Clicked="OnLichClicked"
+                        FontFamily="Courier New" FontSize="14"
+                        BackgroundColor="{StaticResource AccentColor}" TextColor="Black"
+                        HorizontalOptions="FillAndExpand" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
 
-        <!-- Game Output -->
-        <ScrollView
-      VerticalOptions="FillAndExpand"
-      BackgroundColor="#F0F0F0"      
-      Padding="5">
-            <Label
-        x:Name="GameOutput"
-        FontFamily="Courier New"
-        FontSize="14"
-        LineBreakMode="NoWrap" 
-                TextColor="Black"/>
-            
-        </ScrollView>
+        <!-- Row 1: Game output section -->
+        <!-- Main Story output window (left side, larger) -->
+        <Frame Grid.Row="1" Grid.Column="0"
+               BackgroundColor="{StaticResource OffBlack}" BorderColor="{StaticResource Gray600}"
+               CornerRadius="5" HasShadow="False"
+               HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+            <VerticalStackLayout Spacing="2" Padding="5" VerticalOptions="FillAndExpand">
+                <!-- Window title -->
+                <Label Text="Story" FontAttributes="Bold"
+                       FontFamily="Courier New" FontSize="14"
+                       TextColor="{StaticResource AccentColor}" />
+                <!-- Scrollable Story output content -->
+                <ScrollView x:Name="StoryScroll" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
+                    <Label x:Name="StoryOutput"
+                           FontFamily="Courier New" FontSize="14"
+                           LineBreakMode="NoWrap"
+                           TextColor="{StaticResource White}" />
+                </ScrollView>
+            </VerticalStackLayout>
+        </Frame>
 
-        <!-- Command Entry -->
-        <HorizontalStackLayout Spacing="10">
-            <Entry
-        x:Name="CommandEntry"
-        Placeholder="Enter command"
-        Completed="OnCommandEntered"
-        HorizontalOptions="FillAndExpand" />
-            <Button
-        Text="Send"
-        Clicked="OnCommandEntered" />
-        </HorizontalStackLayout>
+        <!-- Auxiliary output windows (right side, stacked: Thoughts over Speech) -->
+        <Grid Grid.Row="1" Grid.Column="1" RowDefinitions="*,*" RowSpacing="8" VerticalOptions="FillAndExpand">
+            <!-- Thoughts output window -->
+            <Frame Grid.Row="0"
+                   BackgroundColor="{StaticResource OffBlack}" BorderColor="{StaticResource Gray600}"
+                   CornerRadius="5" HasShadow="False"
+                   HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+                <VerticalStackLayout Spacing="2" Padding="5" VerticalOptions="FillAndExpand">
+                    <Label Text="Thoughts" FontAttributes="Bold"
+                           FontFamily="Courier New" FontSize="14"
+                           TextColor="{StaticResource AccentColor}" />
+                    <ScrollView x:Name="ThoughtsScroll" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
+                        <Label x:Name="ThoughtsOutput"
+                               FontFamily="Courier New" FontSize="14"
+                               LineBreakMode="NoWrap"
+                               TextColor="{StaticResource White}" />
+                    </ScrollView>
+                </VerticalStackLayout>
+            </Frame>
+            <!-- Speech output window -->
+            <Frame Grid.Row="1"
+                   BackgroundColor="{StaticResource OffBlack}" BorderColor="{StaticResource Gray600}"
+                   CornerRadius="5" HasShadow="False"
+                   HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+                <VerticalStackLayout Spacing="2" Padding="5" VerticalOptions="FillAndExpand">
+                    <Label Text="Speech" FontAttributes="Bold"
+                           FontFamily="Courier New" FontSize="14"
+                           TextColor="{StaticResource AccentColor}" />
+                    <ScrollView x:Name="SpeechScroll" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
+                        <Label x:Name="SpeechOutput"
+                               FontFamily="Courier New" FontSize="14"
+                               LineBreakMode="NoWrap"
+                               TextColor="{StaticResource White}" />
+                    </ScrollView>
+                </VerticalStackLayout>
+            </Frame>
+        </Grid>
 
-        <!-- Test Command Entry -->
-        <HorizontalStackLayout Spacing="10">
-            <Entry
-        x:Name="TestCommandEntry"
-        Placeholder="Test command"
-        HorizontalOptions="FillAndExpand" />
-            <Button
-        Text="Send Test"
-        Clicked="OnTestCommandClicked" />
-        </HorizontalStackLayout>
+        <!-- Row 2: Command input bar at bottom -->
+        <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" ColumnDefinitions="*,Auto" ColumnSpacing="10">
+            <!-- Command text entry -->
+            <Entry x:Name="CommandEntry" Grid.Column="0"
+                   Placeholder="Enter command..." Completed="OnCommandEntered"
+                   FontFamily="Courier New" FontSize="14"
+                   TextColor="{StaticResource White}" BackgroundColor="{StaticResource OffBlack}"
+                   HorizontalOptions="FillAndExpand" />
+            <!-- Send button -->
+            <Button Text="Send" Grid.Column="1" Clicked="OnCommandEntered"
+                    FontFamily="Courier New" FontSize="14"
+                    BackgroundColor="{StaticResource AccentColor}" TextColor="Black"
+                    CornerRadius="5" Padding="12,6" />
+        </Grid>
 
-    </VerticalStackLayout>
+        <!-- (Optional: a Test Command section could be added similarly if needed for debugging) -->
+    </Grid>
 </ContentPage>

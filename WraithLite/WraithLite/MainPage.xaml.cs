@@ -1,198 +1,88 @@
-﻿using System;
+﻿using Microsoft.Maui.Controls;
+using System;
 using System.Diagnostics;
-using System.IO;
 using System.Threading.Tasks;
-using Microsoft.Maui.Controls;
-using Microsoft.Maui.ApplicationModel;   // for MainThread
 using WraithLite.Services;
-using Process = System.Diagnostics.Process;
 
 namespace WraithLite
 {
     public partial class MainPage : ContentPage
     {
-        readonly GameClient _client = new GameClient();
-        Process _lichProcess;
-        bool _lichRunning;
+        private readonly GameClient _client = new();
+        private bool _isConnected = false;
 
         public MainPage()
         {
             InitializeComponent();
+            SendButton.Clicked += OnSendClicked;
+            ConnectButton.Clicked += OnConnectClicked;
+            LichButton.Clicked += OnLichClicked;
         }
 
-        // Called when the user taps "Connect"
-        async void OnConnectClicked(object sender, EventArgs e)
+        private async void OnConnectClicked(object sender, EventArgs e)
         {
-            ConnectButton.IsEnabled = false;
-            LichButton.IsEnabled = false;
+            if (_isConnected) return;
 
-            GameOutput.Text += "Connecting to SGE…\n";
             try
             {
-                var (host, port, key) = await _client.FullSgeLoginAsync(
-                    UsernameEntry.Text, PasswordEntry.Text);
+                // These could be moved to text entries for dynamic input
+                var (host, port, sessionKey) = await _client.FullSgeLoginAsync("preddy777", "avamae1212");
 
-                GameOutput.Text += $"SGE host={host}, port={port}, key={key}\n";
-                GameOutput.Text += "Connecting to game server…\n";
+                await _client.ConnectToGameAsync(host, port, sessionKey, OnGameOutputReceived);
 
-                await _client.ConnectToGameAsync(host, port, key, line =>
-                {
-                    MainThread.BeginInvokeOnMainThread(() =>
-                        GameOutput.Text += line + "\n");
-                });
-
-                GameOutput.Text += "Connected to game – streaming output below:\n";
+                AppendToStory(">>> Connected to game server.");
+                _isConnected = true;
             }
             catch (Exception ex)
             {
-                GameOutput.Text += $"ERROR during SGE login: {ex.Message}\n";
-            }
-            finally
-            {
-                ConnectButton.IsEnabled = true;
-                LichButton.IsEnabled = true;
+                AppendToStory($"ERROR: {ex.Message}");
             }
         }
 
-        // Called when the user taps "Lich" or "Stop Lich"
-        void OnLichClicked(object sender, EventArgs e)
+        private async void OnSendClicked(object sender, EventArgs e)
         {
-            if (!_lichRunning)
+            var command = CommandEntry.Text;
+            if (!string.IsNullOrWhiteSpace(command))
             {
-                // start Lich5 headlessly
-                ConnectButton.IsEnabled = false;
-                LichButton.IsEnabled = false;
-
-                try
-                {
-                    var psi = new ProcessStartInfo
-                    {
-                        FileName = "ruby",  // or full path to ruby.exe
-                        Arguments =
-                          $"lich.rbw --client-mode --frontend=dumb --game=GS --login={UsernameEntry.Text} --password={PasswordEntry.Text}",
-                        WorkingDirectory = @"C:\Users\pREDDY\Desktop\Lich5",
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true,
-                        RedirectStandardInput = true,
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    };
-
-                    _lichProcess = Process.Start(psi);
-                    _lichProcess.EnableRaisingEvents = true;
-
-                    // When Lich exits on its own
-                    _lichProcess.Exited += (s, ev) =>
-                    {
-                        MainThread.BeginInvokeOnMainThread(() =>
-                        {
-                            _lichRunning = false;
-                            LichButton.Text = "Lich";
-                            GameOutput.Text += "[Lich] Process exited\n";
-                            ConnectButton.IsEnabled = true;
-                            LichButton.IsEnabled = true;
-                        });
-                    };
-
-                    _lichProcess.OutputDataReceived += (s, ev) =>
-                    {
-                        if (!string.IsNullOrEmpty(ev.Data))
-                            MainThread.BeginInvokeOnMainThread(() =>
-                                GameOutput.Text += ev.Data + "\n");
-                    };
-                    _lichProcess.ErrorDataReceived += (s, ev) =>
-                    {
-                        if (!string.IsNullOrEmpty(ev.Data))
-                            MainThread.BeginInvokeOnMainThread(() =>
-                                GameOutput.Text += "[Lich ERR] " + ev.Data + "\n");
-                    };
-
-                    _lichProcess.BeginOutputReadLine();
-                    _lichProcess.BeginErrorReadLine();
-
-                    _lichRunning = true;
-                    LichButton.Text = "Stop Lich";
-                }
-                catch (Exception ex)
-                {
-                    GameOutput.Text += $"[Error] Could not launch Lich: {ex.Message}\n";
-                    ConnectButton.IsEnabled = true;
-                }
-                finally
-                {
-                    LichButton.IsEnabled = true;
-                }
-            }
-            else
-            {
-                // stop Lich
-                try { if (!_lichProcess.HasExited) _lichProcess.Kill(); }
-                catch { /* ignore */ }
-                _lichProcess.Dispose();
-                _lichProcess = null;
-                _lichRunning = false;
-                LichButton.Text = "Lich";
+                await _client.SendCommandAsync(command);
+                AppendToStory($"> {command}");
+                CommandEntry.Text = string.Empty;
             }
         }
 
-        // Called when the user presses Enter in the command box
-        async void OnCommandEntered(object sender, EventArgs e)
+        private void OnLichClicked(object sender, EventArgs e)
         {
-            var cmd = CommandEntry.Text;
-            CommandEntry.Text = "";
-
-            if (_lichRunning && _lichProcess != null)
-            {
-                try
-                {
-                    await _lichProcess.StandardInput.WriteLineAsync(cmd);
-                }
-                catch (Exception ex)
-                {
-                    GameOutput.Text += $"[Error] Failed to send to Lich: {ex.Message}\n";
-                }
-            }
-            else
-            {
-                try
-                {
-                    await _client.SendCommandAsync(cmd);
-                }
-                catch (Exception ex)
-                {
-                    GameOutput.Text += $"[Error] Failed to send command: {ex.Message}\n";
-                }
-            }
+            AppendToStory("Lich integration not implemented yet.");
+            // Placeholder for launching or connecting to lich5 integration
         }
 
-        async void OnTestCommandClicked(object sender, EventArgs e)
+        private void OnGameOutputReceived(string line)
         {
-            var cmd = TestCommandEntry.Text?.Trim();
-            if (string.IsNullOrEmpty(cmd))
-                return;
-
-            // Echo it into the output so you can see what you're sending
-            GameOutput.Text += $"> {cmd}\n";
-
-            try
+            // You can route more precisely with smarter parsing
+            MainThread.BeginInvokeOnMainThread(() =>
             {
-                // If Lich is running, send to Lich; otherwise use direct socket
-                if (_lichRunning && _lichProcess != null)
-                {
-                    await _lichProcess.StandardInput.WriteLineAsync(cmd);
-                }
+                if (line.Contains("thoughtfully"))
+                    AppendToThoughts(line);
+                else if (line.Contains("says") || line.Contains("asks"))
+                    AppendToSpeech(line);
                 else
-                {
-                    await _client.SendCommandAsync(cmd);
-                }
-            }
-            catch (Exception ex)
-            {
-                GameOutput.Text += $"[Error] Failed to send test command: {ex.Message}\n";
-            }
-
-            TestCommandEntry.Text = "";
+                    AppendToStory(line);
+            });
         }
 
+        private void AppendToStory(string line)
+        {
+            StoryOutput.Text += line + Environment.NewLine;
+        }
+
+        private void AppendToThoughts(string line)
+        {
+            ThoughtsOutput.Text += line + Environment.NewLine;
+        }
+
+        private void AppendToSpeech(string line)
+        {
+            SpeechOutput.Text += line + Environment.NewLine;
+        }
     }
 }

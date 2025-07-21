@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WraithLite")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+61967e90688844862b8876e244d34e44b0300c0a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5d007dac988dfaf8ef14060885132898cf34eadd")]
 [assembly: System.Reflection.AssemblyProductAttribute("WraithLite")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WraithLite")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

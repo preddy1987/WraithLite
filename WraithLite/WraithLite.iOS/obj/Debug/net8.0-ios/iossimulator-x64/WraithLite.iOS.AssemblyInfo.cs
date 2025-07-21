@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WraithLite.iOS")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+37a767eb2e4eea123dbd0830fcffaa469f357b9b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5d007dac988dfaf8ef14060885132898cf34eadd")]
 [assembly: System.Reflection.AssemblyProductAttribute("WraithLite.iOS")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WraithLite.iOS")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
