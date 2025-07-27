@@ -1,1 +1,0 @@
-C:\workspace\WraithLite\WraithLite\WraithLite.WinUI\WraithLite.WinUI.csproj;x64
