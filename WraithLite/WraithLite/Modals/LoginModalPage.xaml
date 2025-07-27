@@ -1,17 +1,24 @@
-<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="WraithLite.LoginModalPage"
              BackgroundColor="Black"
              Padding="30">
-
     <VerticalStackLayout Spacing="20" VerticalOptions="Center">
-        <Label Text="Login" FontSize="24" HorizontalOptions="Center" TextColor="Orange" />
+        <Label Text="Login" FontSize="24" TextColor="Orange"
+               HorizontalOptions="Center" />
 
-        <Entry x:Name="UsernameEntry" Placeholder="Username" FontSize="16" />
-        <Entry x:Name="PasswordEntry" Placeholder="Password" IsPassword="True" FontSize="16" />
+        <Entry x:Name="UsernameEntry" Placeholder="Username" FontSize="16" 
+               TextColor="White" />
+        <Entry x:Name="PasswordEntry" Placeholder="Password" IsPassword="True" FontSize="16" 
+               TextColor="White" Completed="OnLoginClicked" />
+        <!-- Pressing Enter triggers login -->
 
-        <Button Text="Login" Clicked="OnLoginClicked"
-                BackgroundColor="Orange" TextColor="Black" />
+        <!-- Buttons row: Login and Cancel -->
+        <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
+            <Button Text="Cancel" Clicked="OnCancelClicked"
+                    BackgroundColor="Gray" TextColor="White" />
+            <Button Text="Login" Clicked="OnLoginClicked"
+                    BackgroundColor="Orange" TextColor="Black" />
+        </HorizontalStackLayout>
     </VerticalStackLayout>
 </ContentPage>

@@ -1,9 +1,7 @@
-﻿<ContentPage
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    x:Class="WraithLite.MainPage"
-    BackgroundColor="Black">
-
+﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="WraithLite.MainPage"
+             BackgroundColor="Black">
     <ContentPage.Resources>
         <Color x:Key="AccentColor">#FF8C00</Color>
         <Color x:Key="PanelColor">#1E1E1E</Color>
@@ -12,7 +10,6 @@
     <Grid Padding="8" RowSpacing="8" ColumnSpacing="8"
           RowDefinitions="Auto,*,Auto"
           ColumnDefinitions="2*,*">
-
         <!-- Login Fields -->
         <VerticalStackLayout Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Spacing="4">
             <HorizontalStackLayout Spacing="6">
@@ -35,7 +32,9 @@
                 <Label Text="Story" FontAttributes="Bold"
                        FontFamily="Courier New" FontSize="14"
                        TextColor="{StaticResource AccentColor}" />
-                <ScrollView x:Name="StoryScroll" VerticalOptions="FillAndExpand">
+                <!-- Added Scrolled event to track user scrolling -->
+                <ScrollView x:Name="StoryScroll" VerticalOptions="FillAndExpand" 
+                           Scrolled="OnStoryScrollScrolled">
                     <VerticalStackLayout x:Name="StoryOutputStack" />
                 </ScrollView>
             </VerticalStackLayout>
@@ -50,7 +49,9 @@
                     <Label Text="Thoughts" FontAttributes="Bold"
                            FontFamily="Courier New" FontSize="14"
                            TextColor="{StaticResource AccentColor}" />
-                    <ScrollView x:Name="ThoughtsScroll" VerticalOptions="FillAndExpand">
+                    <!-- Added Scrolled event for Thoughts scroll -->
+                    <ScrollView x:Name="ThoughtsScroll" VerticalOptions="FillAndExpand" 
+                               Scrolled="OnThoughtsScrollScrolled">
                         <VerticalStackLayout x:Name="ThoughtsOutputStack" />
                     </ScrollView>
                 </VerticalStackLayout>
@@ -63,7 +64,9 @@
                     <Label Text="Speech" FontAttributes="Bold"
                            FontFamily="Courier New" FontSize="14"
                            TextColor="{StaticResource AccentColor}" />
-                    <ScrollView x:Name="SpeechScroll" VerticalOptions="FillAndExpand">
+                    <!-- Added Scrolled event for Speech scroll -->
+                    <ScrollView x:Name="SpeechScroll" VerticalOptions="FillAndExpand" 
+                               Scrolled="OnSpeechScrollScrolled">
                         <VerticalStackLayout x:Name="SpeechOutputStack" />
                     </ScrollView>
                 </VerticalStackLayout>
