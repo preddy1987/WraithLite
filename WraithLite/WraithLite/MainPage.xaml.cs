@@ -23,10 +23,31 @@ namespace WraithLite
         private async void OnConnectClicked(object sender, EventArgs e)
         {
             if (_isConnected) return;
+
             try
             {
-                // (Existing logic to show login modal and connect omitted for brevity)
-                // ...
+                // Show login modal and await credentials
+                var loginPage = new LoginModalPage();
+                loginPage.LoginCompleted += async (s, args) =>
+                {
+                    _username = args.Username;
+                    _password = args.Password;
+
+                    try
+                    {
+                        var (host, port, sessionKey) = await _client.FullSgeLoginAsync(_username, _password);
+                        await _client.ConnectToGameAsync(host, port, sessionKey, OnGameOutputReceived);
+
+                        AppendToStory(">>> Connected to game server.");
+                        _isConnected = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        AppendToStory($"ERROR: {ex.Message}");
+                    }
+                };
+
+                await Navigation.PushModalAsync(loginPage);
             }
             catch (Exception ex)
             {
