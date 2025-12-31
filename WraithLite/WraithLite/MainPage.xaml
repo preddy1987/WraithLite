@@ -15,12 +15,10 @@
             <HorizontalStackLayout Spacing="6">
                 <Button x:Name="ConnectButton" Text="Play" Clicked="OnConnectClicked"
                         BackgroundColor="{StaticResource AccentColor}" TextColor="Black"
-                        FontFamily="Courier New" FontSize="14"
-                        HorizontalOptions="FillAndExpand"/>
-                <Button x:Name="LichButton" Text="Lich" Clicked="OnLichClicked"
+                        FontFamily="Courier New" FontSize="14"/>
+                <Button x:Name="LichButton" Text="Lich" Clicked="OnLichClickedAsync"
                         BackgroundColor="{StaticResource AccentColor}" TextColor="Black"
-                        FontFamily="Courier New" FontSize="14"
-                        HorizontalOptions="FillAndExpand"/>
+                        FontFamily="Courier New" FontSize="14"/>
             </HorizontalStackLayout>
         </VerticalStackLayout>
 
@@ -28,16 +26,16 @@
         <Frame Grid.Row="1" Grid.Column="0"
                BackgroundColor="{StaticResource PanelColor}" BorderColor="Gray"
                CornerRadius="4" HasShadow="False">
-            <VerticalStackLayout Padding="5" Spacing="4">
-                <Label Text="Story" FontAttributes="Bold"
+            <Grid Padding="5" RowDefinitions="Auto,*">
+                <Label Grid.Row="0" Text="Story" FontAttributes="Bold"
                        FontFamily="Courier New" FontSize="14"
                        TextColor="{StaticResource AccentColor}" />
                 <!-- Added Scrolled event to track user scrolling -->
-                <ScrollView x:Name="StoryScroll" VerticalOptions="FillAndExpand" 
+                <ScrollView Grid.Row="1" x:Name="StoryScroll" 
                            Scrolled="OnStoryScrollScrolled">
                     <VerticalStackLayout x:Name="StoryOutputStack" />
                 </ScrollView>
-            </VerticalStackLayout>
+            </Grid>
         </Frame>
 
         <!-- Thoughts and Speech Outputs -->
@@ -45,31 +43,31 @@
             <Frame Grid.Row="0"
                    BackgroundColor="{StaticResource PanelColor}" BorderColor="Gray"
                    CornerRadius="4" HasShadow="False">
-                <VerticalStackLayout Padding="5" Spacing="4">
-                    <Label Text="Thoughts" FontAttributes="Bold"
+                <Grid Padding="5" RowDefinitions="Auto,*">
+                    <Label Grid.Row="0" Text="Thoughts" FontAttributes="Bold"
                            FontFamily="Courier New" FontSize="14"
                            TextColor="{StaticResource AccentColor}" />
                     <!-- Added Scrolled event for Thoughts scroll -->
-                    <ScrollView x:Name="ThoughtsScroll" VerticalOptions="FillAndExpand" 
+                    <ScrollView Grid.Row="1" x:Name="ThoughtsScroll"
                                Scrolled="OnThoughtsScrollScrolled">
                         <VerticalStackLayout x:Name="ThoughtsOutputStack" />
                     </ScrollView>
-                </VerticalStackLayout>
+                </Grid>
             </Frame>
 
             <Frame Grid.Row="1"
                    BackgroundColor="{StaticResource PanelColor}" BorderColor="Gray"
                    CornerRadius="4" HasShadow="False">
-                <VerticalStackLayout Padding="5" Spacing="4">
-                    <Label Text="Speech" FontAttributes="Bold"
+                <Grid Padding="5" RowDefinitions="Auto,*">
+                    <Label Grid.Row="0" Text="Speech" FontAttributes="Bold"
                            FontFamily="Courier New" FontSize="14"
                            TextColor="{StaticResource AccentColor}" />
                     <!-- Added Scrolled event for Speech scroll -->
-                    <ScrollView x:Name="SpeechScroll" VerticalOptions="FillAndExpand" 
+                    <ScrollView Grid.Row="1" x:Name="SpeechScroll"
                                Scrolled="OnSpeechScrollScrolled">
                         <VerticalStackLayout x:Name="SpeechOutputStack" />
                     </ScrollView>
-                </VerticalStackLayout>
+                </Grid>
             </Frame>
         </Grid>
 
@@ -79,8 +77,7 @@
             <Entry x:Name="CommandEntry" Grid.Column="0"
                    Placeholder="Enter command..." Completed="OnCommandEntered"
                    FontFamily="Courier New" FontSize="14"
-                   BackgroundColor="{StaticResource PanelColor}" TextColor="White"
-                   HorizontalOptions="FillAndExpand"/>
+                   BackgroundColor="{StaticResource PanelColor}" TextColor="White"/>
             <Button Text="Send" Grid.Column="1" Clicked="OnCommandEntered"
                     FontFamily="Courier New" FontSize="14"
                     BackgroundColor="{StaticResource AccentColor}" TextColor="Black"
