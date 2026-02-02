@@ -145,11 +145,12 @@ namespace WraithLite.Services
 
             await OpenLogAsync();
 
+            // Start reading FIRST so you capture everything from byte 0
+            _ = Task.Run(() => ReadLoopAsync(onOutput, _readLoopCts.Token), _readLoopCts.Token);
+
             // Handshake: KEY then blank line
             await SendRawLineAsync(sessionKey, _readLoopCts.Token);
             await SendRawLineAsync(string.Empty, _readLoopCts.Token);
-
-            _ = Task.Run(() => ReadLoopAsync(onOutput, _readLoopCts.Token), _readLoopCts.Token);
         }
 
         private async Task ReadLoopAsync(Action<string> onOutput, CancellationToken ct)
@@ -165,21 +166,22 @@ namespace WraithLite.Services
                     if (n <= 0)
                         break;
 
-                    var rawText = Latin1.GetString(buffer, 0, n);
+                    // RAW BYTES (HEX)
+                    await WriteLogLineAsync(
+                        $"{Timestamp()} INB({n}): {ToHex(buffer, n)}"
+                    );
 
-                    await WriteLogLineAsync($"{Timestamp()} IN : {rawText.Replace("\r", "\\r").Replace("\n", "\\n")}");
+                    // DECODED TEXT
+                    var rawText = Latin1.GetString(buffer, 0, n);
+                    await WriteLogLineAsync(
+                        $"{Timestamp()} INT({n}): {EscapeForLog(rawText)}"
+                    );
 
                     sb.Append(rawText);
 
-                    // Split on CR, LF, or CRLF
                     while (TryTakeLine(sb, out var line))
-                    {
-                        // Emit every logical “line”
                         onOutput(line);
-                    }
 
-                    // StormFront/GS often ends output with a bare prompt ">" with NO newline.
-                    // If that's all that's left in the buffer, emit it immediately.
                     if (sb.Length == 1 && sb[0] == '>')
                     {
                         sb.Clear();
@@ -199,6 +201,8 @@ namespace WraithLite.Services
                 await WriteLogLineAsync($"{Timestamp()} INF: Read loop ended.");
             }
         }
+
+
 
         // Handles \n, \r, or \r\n without losing content
         private static bool TryTakeLine(StringBuilder sb, out string line)
@@ -323,6 +327,42 @@ namespace WraithLite.Services
         }
 
         private static string Timestamp() => DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+
+        private static string ToHex(byte[] buffer, int length)
+        {
+            var sb = new StringBuilder(length * 2);
+            for (int i = 0; i < length; i++)
+                sb.Append(buffer[i].ToString("X2"));
+            return sb.ToString();
+        }
+
+
+        private static string EscapeForLog(string s)
+        {
+            if (s == null) return "<null>";
+
+            // Make control chars visible, including NUL and ESC
+            var sb = new StringBuilder(s.Length);
+            foreach (var ch in s)
+            {
+                switch (ch)
+                {
+                    case '\r': sb.Append("\\r"); break;
+                    case '\n': sb.Append("\\n"); break;
+                    case '\t': sb.Append("\\t"); break;
+                    case '\0': sb.Append("\\0"); break;
+                    case (char)0x1B: sb.Append("\\x1B"); break; // ESC (ANSI)
+                    default:
+                        if (char.IsControl(ch))
+                            sb.Append($"\\x{(int)ch:X2}");
+                        else
+                            sb.Append(ch);
+                        break;
+                }
+            }
+            return sb.ToString();
+        }
+
 
         // ==========================================================
         // Cleanup
