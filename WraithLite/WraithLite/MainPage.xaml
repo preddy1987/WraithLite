@@ -7,11 +7,12 @@
         <Color x:Key="PanelColor">#1E1E1E</Color>
     </ContentPage.Resources>
 
-    <Grid Padding="8" RowSpacing="8" ColumnSpacing="8"
+    <!-- Main layout grid: login row, content row (with floating panels), and command input row -->
+    <Grid Padding="8" RowSpacing="8"
           RowDefinitions="Auto,*,Auto"
-          ColumnDefinitions="2*,*">
-        <!-- Login Fields -->
-        <VerticalStackLayout Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Spacing="4">
+          ColumnDefinitions="*">
+        <!-- Login Fields (top row) -->
+        <VerticalStackLayout Grid.Row="0" Spacing="4">
             <HorizontalStackLayout Spacing="6">
                 <Button x:Name="ConnectButton" Text="Play" Clicked="OnConnectClicked"
                         BackgroundColor="{StaticResource AccentColor}" TextColor="Black"
@@ -22,58 +23,307 @@
             </HorizontalStackLayout>
         </VerticalStackLayout>
 
-        <!-- Story Output -->
-        <Frame Grid.Row="1" Grid.Column="0"
-               BackgroundColor="{StaticResource PanelColor}" BorderColor="Gray"
-               CornerRadius="4" HasShadow="False">
-            <Grid Padding="5" RowDefinitions="Auto,*">
-                <Label Grid.Row="0" Text="Story" FontAttributes="Bold"
-                       FontFamily="Courier New" FontSize="14"
-                       TextColor="{StaticResource AccentColor}" />
-                <!-- Added Scrolled event to track user scrolling -->
-                <ScrollView Grid.Row="1" x:Name="StoryScroll" 
-                           Scrolled="OnStoryScrollScrolled">
-                    <VerticalStackLayout x:Name="StoryOutputStack" />
-                </ScrollView>
-            </Grid>
-        </Frame>
-
-        <!-- Thoughts and Speech Outputs -->
-        <Grid Grid.Row="1" Grid.Column="1" RowDefinitions="*,*" RowSpacing="6">
-            <Frame Grid.Row="0"
+        <!-- Content area (middle row) with floating panels inside an AbsoluteLayout -->
+        <AbsoluteLayout Grid.Row="1">
+            <!-- Story Window Panel -->
+            <Frame x:Name="StoryWindow"
                    BackgroundColor="{StaticResource PanelColor}" BorderColor="Gray"
-                   CornerRadius="4" HasShadow="False">
-                <Grid Padding="5" RowDefinitions="Auto,*">
-                    <Label Grid.Row="0" Text="Thoughts" FontAttributes="Bold"
-                           FontFamily="Courier New" FontSize="14"
-                           TextColor="{StaticResource AccentColor}" />
-                    <!-- Added Scrolled event for Thoughts scroll -->
-                    <ScrollView Grid.Row="1" x:Name="ThoughtsScroll"
-                               Scrolled="OnThoughtsScrollScrolled">
-                        <VerticalStackLayout x:Name="ThoughtsOutputStack" />
-                    </ScrollView>
-                </Grid>
+                   CornerRadius="2" HasShadow="False" Padding="2" Margin="3"
+                   AbsoluteLayout.LayoutBounds="0,0,0.66,1"
+                   AbsoluteLayout.LayoutFlags="All">
+                <AbsoluteLayout>
+                    <!-- Story content (title + scrollable output) -->
+                    <Grid Padding="1" RowDefinitions="Auto,*"
+                          AbsoluteLayout.LayoutBounds="0,0,1,1"
+                          AbsoluteLayout.LayoutFlags="All">
+                        <Grid Grid.Row="0" BackgroundColor="Gray"
+                              HeightRequest="20"
+                              InputTransparent="False">
+                            <Grid.GestureRecognizers>
+                                <PanGestureRecognizer PanUpdated="OnDragWindow" />
+                            </Grid.GestureRecognizers>
+                            <Label Text="Story" FontAttributes="Bold"
+                                   FontFamily="Courier New" FontSize="14"
+                                   TextColor="{StaticResource AccentColor}" 
+                                   VerticalOptions="Center" HorizontalOptions="Start" Padding="8,0"/>
+                        </Grid>
+
+                        <ScrollView Grid.Row="1" x:Name="StoryScroll" Scrolled="OnStoryScrollScrolled">
+                            <VerticalStackLayout x:Name="StoryOutputStack" />
+                        </ScrollView>
+                    </Grid>
+                    <!-- Resizable grips for StoryWindow -->
+                    <!-- Left edge grip -->
+                    <BoxView Color="Transparent"
+                             InputTransparent="False"
+                             ClassId="Left"
+                            AbsoluteLayout.LayoutBounds="0,0,5,1"
+                            AbsoluteLayout.LayoutFlags="HeightProportional">
+                        <BoxView.GestureRecognizers>
+                            <PanGestureRecognizer PanUpdated="OnResizeEdge" />
+                        </BoxView.GestureRecognizers>
+                    </BoxView>
+                    <!-- Right edge grip -->
+                    <BoxView Color="Transparent"
+                             InputTransparent="False"
+                             ClassId="Right"
+                            AbsoluteLayout.LayoutBounds="1,0,5,1"
+                            AbsoluteLayout.LayoutFlags="HeightProportional,XProportional"
+                            AnchorX="1">
+                        <BoxView.GestureRecognizers>
+                            <PanGestureRecognizer PanUpdated="OnResizeEdge" />
+                        </BoxView.GestureRecognizers>
+                    </BoxView>
+                    <!-- Top edge grip -->
+                    <BoxView Color="Transparent"
+                             InputTransparent="False"
+                             ClassId="Top"
+                            AbsoluteLayout.LayoutBounds="0,0,1,5"
+                            AbsoluteLayout.LayoutFlags="WidthProportional">
+                        <BoxView.GestureRecognizers>
+                            <PanGestureRecognizer PanUpdated="OnResizeEdge" />
+                        </BoxView.GestureRecognizers>
+                    </BoxView>
+                    <!-- Bottom edge grip -->
+                    <BoxView Color="Transparent"
+                             InputTransparent="False"
+                             ClassId="Bottom"
+                            AbsoluteLayout.LayoutBounds="0,1,1,5"
+                            AbsoluteLayout.LayoutFlags="WidthProportional,YProportional"
+                            AnchorY="1">
+                        <BoxView.GestureRecognizers>
+                            <PanGestureRecognizer PanUpdated="OnResizeEdge" />
+                        </BoxView.GestureRecognizers>
+                    </BoxView>
+                    <!-- Top-left corner grip -->
+                    <BoxView Color="Transparent"
+                             InputTransparent="False"
+                             ClassId="TopLeft"
+                            AbsoluteLayout.LayoutBounds="0,0,20,20"
+                            AbsoluteLayout.LayoutFlags="None">
+                        <BoxView.GestureRecognizers>
+                            <PanGestureRecognizer PanUpdated="OnResizeEdge" />
+                        </BoxView.GestureRecognizers>
+                    </BoxView>
+                    <!-- Top-right corner grip -->
+                    <BoxView Color="Transparent"
+                             InputTransparent="False"
+                             ClassId="TopRight"
+                            AbsoluteLayout.LayoutBounds="1,0,20,20"
+                            AbsoluteLayout.LayoutFlags="XProportional"
+                            AnchorX="1">
+                        <BoxView.GestureRecognizers>
+                            <PanGestureRecognizer PanUpdated="OnResizeEdge" />
+                        </BoxView.GestureRecognizers>
+                    </BoxView>
+                    <!-- Bottom-left corner grip -->
+                    <BoxView Color="Transparent"
+                             InputTransparent="False"
+                             ClassId="BottomLeft"
+                            AbsoluteLayout.LayoutBounds="0,1,20,20"
+                            AbsoluteLayout.LayoutFlags="YProportional"
+                            AnchorY="1">
+                        <BoxView.GestureRecognizers>
+                            <PanGestureRecognizer PanUpdated="OnResizeEdge" />
+                        </BoxView.GestureRecognizers>
+                    </BoxView>
+                    <!-- Bottom-right corner grip -->
+                    <BoxView Color="Transparent"
+                             InputTransparent="False"
+                             ClassId="BottomRight"
+                            AbsoluteLayout.LayoutBounds="1,1,20,20"
+                            AbsoluteLayout.LayoutFlags="XProportional,YProportional"
+                            AnchorX="1" AnchorY="1">
+                        <BoxView.GestureRecognizers>
+                            <PanGestureRecognizer PanUpdated="OnResizeEdge" />
+                        </BoxView.GestureRecognizers>
+                    </BoxView>
+                </AbsoluteLayout>
             </Frame>
 
-            <Frame Grid.Row="1"
+            <!-- Thoughts Window Panel -->
+            <Frame x:Name="ThoughtsWindow"
                    BackgroundColor="{StaticResource PanelColor}" BorderColor="Gray"
-                   CornerRadius="4" HasShadow="False">
-                <Grid Padding="5" RowDefinitions="Auto,*">
-                    <Label Grid.Row="0" Text="Speech" FontAttributes="Bold"
-                           FontFamily="Courier New" FontSize="14"
-                           TextColor="{StaticResource AccentColor}" />
-                    <!-- Added Scrolled event for Speech scroll -->
-                    <ScrollView Grid.Row="1" x:Name="SpeechScroll"
-                               Scrolled="OnSpeechScrollScrolled">
-                        <VerticalStackLayout x:Name="SpeechOutputStack" />
-                    </ScrollView>
-                </Grid>
+                   CornerRadius="2" HasShadow="False" Padding="2" Margin="3"
+                   AbsoluteLayout.LayoutBounds="1,0,0.33,0.5"
+                   AbsoluteLayout.LayoutFlags="All">
+                <AbsoluteLayout>
+                    <Grid Padding="1" RowDefinitions="Auto,*"
+                          AbsoluteLayout.LayoutBounds="0,0,1,1"
+                          AbsoluteLayout.LayoutFlags="All">
+                        <Grid Grid.Row="0" BackgroundColor="Gray"
+                              HeightRequest="20"
+                              InputTransparent="False">
+                            <Grid.GestureRecognizers>
+                                <PanGestureRecognizer PanUpdated="OnDragWindow" />
+                            </Grid.GestureRecognizers>
+                            <Label Text="Thoughts" FontAttributes="Bold"
+                                   FontFamily="Courier New" FontSize="14"
+                                   TextColor="{StaticResource AccentColor}" 
+                                   VerticalOptions="Center" HorizontalOptions="Start" Padding="8,0"/>
+                        </Grid>
+                        <ScrollView Grid.Row="1" x:Name="ThoughtsScroll" Scrolled="OnThoughtsScrollScrolled">
+                            <VerticalStackLayout x:Name="ThoughtsOutputStack" />
+                        </ScrollView>
+                    </Grid>
+                    <!-- Resizable grips for ThoughtsWindow -->
+                    <BoxView Color="Transparent"
+                            AbsoluteLayout.LayoutBounds="0,0,5,1"
+                            AbsoluteLayout.LayoutFlags="HeightProportional">
+                        <BoxView.GestureRecognizers>
+                            <PanGestureRecognizer PanUpdated="OnResizeEdge" />
+                        </BoxView.GestureRecognizers>
+                    </BoxView>
+                    <BoxView Color="Transparent"
+                            AbsoluteLayout.LayoutBounds="1,0,5,1"
+                            AbsoluteLayout.LayoutFlags="HeightProportional,XProportional"
+                            AnchorX="1">
+                        <BoxView.GestureRecognizers>
+                            <PanGestureRecognizer PanUpdated="OnResizeEdge" />
+                        </BoxView.GestureRecognizers>
+                    </BoxView>
+                    <BoxView Color="Transparent"
+                            AbsoluteLayout.LayoutBounds="0,0,1,5"
+                            AbsoluteLayout.LayoutFlags="WidthProportional">
+                        <BoxView.GestureRecognizers>
+                            <PanGestureRecognizer PanUpdated="OnResizeEdge" />
+                        </BoxView.GestureRecognizers>
+                    </BoxView>
+                    <BoxView Color="Transparent"
+                            AbsoluteLayout.LayoutBounds="0,1,1,5"
+                            AbsoluteLayout.LayoutFlags="WidthProportional,YProportional"
+                            AnchorY="1">
+                        <BoxView.GestureRecognizers>
+                            <PanGestureRecognizer PanUpdated="OnResizeEdge" />
+                        </BoxView.GestureRecognizers>
+                    </BoxView>
+                    <BoxView Color="Transparent"
+                            AbsoluteLayout.LayoutBounds="0,0,20,20"
+                            AbsoluteLayout.LayoutFlags="None">
+                        <BoxView.GestureRecognizers>
+                            <PanGestureRecognizer PanUpdated="OnResizeEdge" />
+                        </BoxView.GestureRecognizers>
+                    </BoxView>
+                    <BoxView Color="Transparent"
+                            AbsoluteLayout.LayoutBounds="1,0,20,20"
+                            AbsoluteLayout.LayoutFlags="XProportional"
+                            AnchorX="1">
+                        <BoxView.GestureRecognizers>
+                            <PanGestureRecognizer PanUpdated="OnResizeEdge" />
+                        </BoxView.GestureRecognizers>
+                    </BoxView>
+                    <BoxView Color="Transparent"
+                            AbsoluteLayout.LayoutBounds="0,1,20,20"
+                            AbsoluteLayout.LayoutFlags="YProportional"
+                            AnchorY="1">
+                        <BoxView.GestureRecognizers>
+                            <PanGestureRecognizer PanUpdated="OnResizeEdge" />
+                        </BoxView.GestureRecognizers>
+                    </BoxView>
+                    <BoxView Color="Transparent"
+                            AbsoluteLayout.LayoutBounds="1,1,20,20"
+                            AbsoluteLayout.LayoutFlags="XProportional,YProportional"
+                            AnchorX="1" AnchorY="1">
+                        <BoxView.GestureRecognizers>
+                            <PanGestureRecognizer PanUpdated="OnResizeEdge" />
+                        </BoxView.GestureRecognizers>
+                    </BoxView>
+                </AbsoluteLayout>
             </Frame>
-        </Grid>
 
-        <!-- Command Input -->
-        <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
-              ColumnDefinitions="*,Auto" ColumnSpacing="6">
+            <!-- Speech Window Panel -->
+            <Frame x:Name="SpeechWindow"
+                   BackgroundColor="{StaticResource PanelColor}" BorderColor="Gray"
+                   CornerRadius="2" HasShadow="False" Padding="2" Margin="3"
+                   AbsoluteLayout.LayoutBounds="1,1,0.33,0.5"
+                   AbsoluteLayout.LayoutFlags="All">
+                <AbsoluteLayout>
+                    <Grid Padding="1" RowDefinitions="Auto,*"
+                          AbsoluteLayout.LayoutBounds="0,0,1,1"
+                          AbsoluteLayout.LayoutFlags="All">
+                        <Grid Grid.Row="0" BackgroundColor="Gray"
+                              HeightRequest="20"
+                              InputTransparent="False">
+                            <Grid.GestureRecognizers>
+                                <PanGestureRecognizer PanUpdated="OnDragWindow" />
+                            </Grid.GestureRecognizers>
+                            <Label Text="Speech" FontAttributes="Bold"
+                                   FontFamily="Courier New" FontSize="14"
+                                   TextColor="{StaticResource AccentColor}" 
+                                   VerticalOptions="Center" HorizontalOptions="Start" Padding="8,0"/>
+                        </Grid>
+                        <ScrollView Grid.Row="1" x:Name="SpeechScroll" Scrolled="OnSpeechScrollScrolled">
+                            <VerticalStackLayout x:Name="SpeechOutputStack" />
+                        </ScrollView>
+                    </Grid>
+                    <!-- Resizable grips for SpeechWindow -->
+                    <BoxView Color="Transparent"
+                            AbsoluteLayout.LayoutBounds="0,0,5,1"
+                            AbsoluteLayout.LayoutFlags="HeightProportional">
+                        <BoxView.GestureRecognizers>
+                            <PanGestureRecognizer PanUpdated="OnResizeEdge" />
+                        </BoxView.GestureRecognizers>
+                    </BoxView>
+                    <BoxView Color="Transparent"
+                            AbsoluteLayout.LayoutBounds="1,0,5,1"
+                            AbsoluteLayout.LayoutFlags="HeightProportional,XProportional"
+                            AnchorX="1">
+                        <BoxView.GestureRecognizers>
+                            <PanGestureRecognizer PanUpdated="OnResizeEdge" />
+                        </BoxView.GestureRecognizers>
+                    </BoxView>
+                    <BoxView Color="Transparent"
+                            AbsoluteLayout.LayoutBounds="0,0,1,5"
+                            AbsoluteLayout.LayoutFlags="WidthProportional">
+                        <BoxView.GestureRecognizers>
+                            <PanGestureRecognizer PanUpdated="OnResizeEdge" />
+                        </BoxView.GestureRecognizers>
+                    </BoxView>
+                    <BoxView Color="Transparent"
+                            AbsoluteLayout.LayoutBounds="0,1,1,5"
+                            AbsoluteLayout.LayoutFlags="WidthProportional,YProportional"
+                            AnchorY="1">
+                        <BoxView.GestureRecognizers>
+                            <PanGestureRecognizer PanUpdated="OnResizeEdge" />
+                        </BoxView.GestureRecognizers>
+                    </BoxView>
+                    <BoxView Color="Transparent"
+                            AbsoluteLayout.LayoutBounds="0,0,20,20"
+                            AbsoluteLayout.LayoutFlags="None">
+                        <BoxView.GestureRecognizers>
+                            <PanGestureRecognizer PanUpdated="OnResizeEdge" />
+                        </BoxView.GestureRecognizers>
+                    </BoxView>
+                    <BoxView Color="Transparent"
+                            AbsoluteLayout.LayoutBounds="1,0,20,20"
+                            AbsoluteLayout.LayoutFlags="XProportional"
+                            AnchorX="1">
+                        <BoxView.GestureRecognizers>
+                            <PanGestureRecognizer PanUpdated="OnResizeEdge" />
+                        </BoxView.GestureRecognizers>
+                    </BoxView>
+                    <BoxView Color="Transparent"
+                            AbsoluteLayout.LayoutBounds="0,1,20,20"
+                            AbsoluteLayout.LayoutFlags="YProportional"
+                            AnchorY="1">
+                        <BoxView.GestureRecognizers>
+                            <PanGestureRecognizer PanUpdated="OnResizeEdge" />
+                        </BoxView.GestureRecognizers>
+                    </BoxView>
+                    <BoxView Color="Transparent"
+                            AbsoluteLayout.LayoutBounds="1,1,20,20"
+                            AbsoluteLayout.LayoutFlags="XProportional,YProportional"
+                            AnchorX="1" AnchorY="1">
+                        <BoxView.GestureRecognizers>
+                            <PanGestureRecognizer PanUpdated="OnResizeEdge" />
+                        </BoxView.GestureRecognizers>
+                    </BoxView>
+                </AbsoluteLayout>
+            </Frame>
+        </AbsoluteLayout>
+
+        <!-- Command Input bar (bottom row) -->
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="6">
             <Entry x:Name="CommandEntry" Grid.Column="0"
                    Placeholder="Enter command..." Completed="OnCommandEntered"
                    FontFamily="Courier New" FontSize="14"
@@ -81,7 +331,7 @@
             <Button Text="Send" Grid.Column="1" Clicked="OnCommandEntered"
                     FontFamily="Courier New" FontSize="14"
                     BackgroundColor="{StaticResource AccentColor}" TextColor="Black"
-                    Padding="12,6" />
+                    Padding="12,6"/>
         </Grid>
     </Grid>
 </ContentPage>

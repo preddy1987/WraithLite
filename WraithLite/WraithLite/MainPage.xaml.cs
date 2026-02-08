@@ -29,6 +29,11 @@ namespace WraithLite
             new Regex(@"^You hear the (?<chan>.+?) thoughts of (?<name>.+?) echo in your mind:$",
                       RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
+
+        // Window drag and edge-based resize logic for floating windows
+        private Dictionary<ContentView, Point> _windowStartPositions = new();
+        private Dictionary<ContentView, Rect> _windowStartBounds = new();
+
         private (string Channel, string Speaker)? _pendingThoughtHeader;
         private readonly AnsiStreamParser _ansi = new(new AnsiStreamParser.Options
         {
@@ -71,6 +76,78 @@ namespace WraithLite
                 await AppendToStoryAsync($"ERROR: {ex.Message}");
             }
         }
+
+        private void OnDragWindow(object sender, PanUpdatedEventArgs e)
+        {
+            if (sender is not VisualElement gestureSource) return;
+            var window = gestureSource.Parent?.Parent.Parent as ContentView;
+            if (window == null) return;
+
+
+            switch (e.StatusType)
+            {
+                case GestureStatus.Started:
+                    _windowStartPositions[window] = AbsoluteLayout.GetLayoutBounds(window).Location;
+                    break;
+
+
+                case GestureStatus.Running:
+                    var start = _windowStartPositions[window];
+                    var parentWidth = this.Width;
+                    var parentHeight = this.Height;
+                    var newX = Math.Clamp(start.X + e.TotalX / parentWidth, 0, 1);
+                    var newY = Math.Clamp(start.Y + e.TotalY / parentHeight, 0, 1);
+                    var bounds = AbsoluteLayout.GetLayoutBounds(window);
+                    AbsoluteLayout.SetLayoutBounds(window, new Rect(newX, newY, bounds.Width, bounds.Height));
+                    break;
+            }
+        }
+
+
+        private void OnResizeEdge(object sender, PanUpdatedEventArgs e)
+        {
+            if (sender is not VisualElement handle || handle.Parent?.Parent is not ContentView window) return;
+            var tag = (string)handle.ClassId; // tag indicates which edge/corner (e.g. "Right", "TopLeft")
+            if (string.IsNullOrEmpty(tag)) return;
+
+
+            switch (e.StatusType)
+            {
+                case GestureStatus.Started:
+                    _windowStartBounds[window] = AbsoluteLayout.GetLayoutBounds(window);
+                    break;
+
+
+                case GestureStatus.Running:
+                    var parentWidth = this.Width;
+                    var parentHeight = this.Height;
+                    var bounds = _windowStartBounds[window];
+
+
+                    double x = bounds.X, y = bounds.Y, w = bounds.Width, h = bounds.Height;
+                    double dx = e.TotalX / parentWidth;
+                    double dy = e.TotalY / parentHeight;
+
+
+                    if (tag.Contains("Right")) w = Math.Clamp(bounds.Width + dx, 0.1, 1 - bounds.X);
+                    if (tag.Contains("Left"))
+                    {
+                        x = Math.Clamp(bounds.X + dx, 0, bounds.X + bounds.Width - 0.1);
+                        w = Math.Clamp(bounds.Width - dx, 0.1, bounds.X + bounds.Width);
+                    }
+                    if (tag.Contains("Bottom")) h = Math.Clamp(bounds.Height + dy, 0.1, 1 - bounds.Y);
+                    if (tag.Contains("Top"))
+                    {
+                        y = Math.Clamp(bounds.Y + dy, 0, bounds.Y + bounds.Height - 0.1);
+                        h = Math.Clamp(bounds.Height - dy, 0.1, bounds.Y + bounds.Height);
+                    }
+
+
+                    AbsoluteLayout.SetLayoutBounds(window, new Rect(x, y, w, h));
+                    break;
+            }
+        }
+
 
         private async void OnCommandEntered(object sender, EventArgs e)
         {
