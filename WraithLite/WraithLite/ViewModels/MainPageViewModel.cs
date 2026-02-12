@@ -4,7 +4,7 @@ using WraithLite.Services;
 
 namespace WraithLite.ViewModels;
 
-public class MainViewModel : INotifyPropertyChanged
+public class MainPageViewModel : INotifyPropertyChanged
 {
     private string _output = "Starting Lich5...\n";
     private string _inputText;
@@ -22,7 +22,7 @@ public class MainViewModel : INotifyPropertyChanged
         set { _inputText = value; OnPropertyChanged(); }
     }
 
-    public MainViewModel()
+    public MainPageViewModel()
     {
         _lich = new LichService(OnLichOutput);
         _lich.StartLich();
