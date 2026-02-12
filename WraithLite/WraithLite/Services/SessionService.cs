@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace WraithLite.Services
 {
-    public sealed class GameClient : IDisposable
+    public sealed class SessionService : IDisposable
     {
         private TcpClient _gameTcpClient;
         private NetworkStream _gameStream;

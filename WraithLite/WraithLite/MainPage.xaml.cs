@@ -10,7 +10,7 @@ namespace WraithLite
 {
     public partial class MainPage : ContentPage
     {
-        private readonly GameClient _client = new();
+        private readonly SessionService _client = new();
         private bool _isConnected;
         private string _username;
         private string _password;
