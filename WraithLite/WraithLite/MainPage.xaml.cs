@@ -77,6 +77,24 @@ namespace WraithLite
             }
         }
 
+        private async void OnLichClickedAsync(object sender, EventArgs e)
+        {
+            if (_isConnected) return;
+            try
+            {
+                var host = "127.0.0.1";
+                var port = 8001;
+                _ansi.Reset(); // reset styles per session
+                await _client.ConnectToGameAsync(host, port, OnGameOutputReceived);
+                _isConnected = true;
+                await AppendToStoryAsync(">>> Connected to game server.");
+            }
+            catch (Exception ex)
+            {
+                await AppendToStoryAsync($"ERROR: {ex.Message}");
+            }
+        }
+
         private void OnDragWindow(object sender, PanUpdatedEventArgs e)
         {
             if (sender is not VisualElement gestureSource) return;
@@ -102,7 +120,6 @@ namespace WraithLite
                     break;
             }
         }
-
 
         private void OnResizeEdge(object sender, PanUpdatedEventArgs e)
         {
@@ -148,7 +165,6 @@ namespace WraithLite
             }
         }
 
-
         private async void OnCommandEntered(object sender, EventArgs e)
         {
             var command = CommandEntry.Text?.Trim();
@@ -170,11 +186,6 @@ namespace WraithLite
             {
                 _isSendingCommand = false;
             }
-        }
-
-        private async void OnLichClickedAsync(object sender, EventArgs e)
-        {
-            await AppendToStoryAsync("Lich integration not implemented yet.");
         }
 
         // ScrollView Scrolled event handlers – update flags if user is at bottom

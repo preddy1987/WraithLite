@@ -153,6 +153,28 @@ namespace WraithLite.Services
             await SendRawLineAsync(string.Empty, _readLoopCts.Token);
         }
 
+        public async Task ConnectToGameAsync(string host, int port, Action<string> onOutput)
+        {
+            if (onOutput is null)
+                throw new ArgumentNullException(nameof(onOutput));
+
+            Disconnect();
+
+            _readLoopCts = new CancellationTokenSource();
+
+            _gameTcpClient = new TcpClient { NoDelay = true };
+            await _gameTcpClient.ConnectAsync(host, port);
+            _gameStream = _gameTcpClient.GetStream();
+
+            await OpenLogAsync();
+
+            // Start reading FIRST so you capture everything from byte 0
+            _ = Task.Run(() => ReadLoopAsync(onOutput, _readLoopCts.Token), _readLoopCts.Token);
+
+            // Handshake: KEY then blank line
+            await SendRawLineAsync(string.Empty, _readLoopCts.Token);
+        }
+
         private async Task ReadLoopAsync(Action<string> onOutput, CancellationToken ct)
         {
             var buffer = new byte[4096];
